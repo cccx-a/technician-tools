@@ -149,6 +149,7 @@ export const api = {
             product_name: item.product_name,
             location: item.location,
             matching: item.matching, // Include full matching object
+            match_process: item.match_process,
             fleet_box: item.fleet_box, // Include full fleet_box object
             fleet_product: {
                 fleet_name: item.fleet_name || item.fleet_product?.fleet_name,
@@ -223,12 +224,18 @@ export const api = {
         fpId?: number
     ): Promise<void> => {
         try {
+            // Get user role from localStorage
+            const userJson = localStorage.getItem('user');
+            const user = userJson ? JSON.parse(userJson) : null;
+            const userRoleId = user?.role_id || 18; // Fallback to 18 if not found
+
             // Call external Liftngo API to approve/prove matching
             const formData = new FormData();
             formData.append('m_id', String(mId || vehicleId));
             formData.append('matching_process', '3');
-            formData.append('role', '18');
+            formData.append('role', String(userRoleId));
 
+            console.log('Approving vehicle:', vehicleId, serialNumber, mId, fbId, fpId, userRoleId);
             const externalResponse = await fetch('https://liftngo.tmh-wst.com/api/prove_matching', {
                 method: 'POST',
                 headers: {
