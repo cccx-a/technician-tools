@@ -305,3 +305,64 @@
 .animate-bounce {
   transition-property: none;
 }
+
+/* Virtual Cursor Animation - Used in VehicleCardV2 */
+@keyframes cursor-move {
+  0% {
+    opacity: 0;
+    transform: translate(80px, 60px) scale(1);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(40px, 30px) scale(1);
+  }
+  40% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(0, 0) scale(0.8);
+  }
+  55% {
+    transform: translate(0, 0) scale(1);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-20px, -20px) scale(0.8);
+  }
+}
+
+@keyframes click-ripple {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  40% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  70% {
+    opacity: 0.3;
+    transform: scale(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+.animate-virtual-cursor {
+  animation: cursor-move 3s ease-out forwards;
+}
+
+.animate-click-ripple {
+  animation: click-ripple 3s ease-out forwards;
+}

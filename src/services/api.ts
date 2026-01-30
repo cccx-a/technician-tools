@@ -137,6 +137,7 @@ export const api = {
             id: item.fp_id || item.fb_id, // Use fp_id (Fleet Product) as primary ID, fallback to fb_id
             fb_id: item.fleet_box?.fb_id || item.fb_id,
             fp_id: item.fp_id,
+            m_id: item.m_id || item.matching?.m_id, // Add m_id from response or matching object
             serial_number: item.serial_number, // Product Serial Number
             box_serial_number: item.fleet_box?.serial_number, // Control Box Serial Number
             model: item.product_name || item.fleet_product?.product_name || 'Unknown Model',
@@ -144,6 +145,11 @@ export const api = {
             status: item.status === 1 ? 'active' : item.status === 2 ? 'maintenance' : 'inactive',
             battery_level: item.battery || item.fleet_product?.battery || 100,
             last_maintenance: item.updated_at || new Date().toISOString(),
+            product_id: item.product_id,
+            product_name: item.product_name,
+            location: item.location,
+            matching: item.matching, // Include full matching object
+            fleet_box: item.fleet_box, // Include full fleet_box object
             fleet_product: {
                 fleet_name: item.fleet_name || item.fleet_product?.fleet_name,
                 serial_number: item.serial_number,
@@ -206,6 +212,47 @@ export const api = {
             }).then(handleResponse);
         } catch (error) {
             console.error('Failed to log action', error);
+        }
+    },
+
+    approveVehicle: async (
+        vehicleId: number | string,
+        serialNumber: string,
+        mId?: number | string,
+        fbId?: number,
+        fpId?: number
+    ): Promise<void> => {
+        try {
+            // Call external Liftngo API to approve/prove matching
+            const formData = new FormData();
+            formData.append('m_id', String(mId || vehicleId));
+            formData.append('matching_process', '3');
+            formData.append('role', '18');
+
+            const externalResponse = await fetch('https://liftngo.tmh-wst.com/api/prove_matching', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                body: formData
+            });
+
+            if (!externalResponse.ok) {
+                const errorText = await externalResponse.text();
+                throw new Error(`External API error: ${externalResponse.status} - ${errorText}`);
+            }
+
+            // After successful external API call, log to history
+            await api.logAction(
+                'QC_APPROVE',
+                `QC Approved vehicle ${serialNumber} (ID: ${vehicleId})`,
+                fbId,
+                fpId
+            );
+
+        } catch (error) {
+            console.error('Failed to approve vehicle:', error);
+            throw error;
         }
     },
 

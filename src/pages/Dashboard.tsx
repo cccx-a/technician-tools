@@ -77,6 +77,7 @@ const Dashboard = () => {
 
   const filteredVehicles = () => {
     const data = vehiclesData()?.data;
+    console.log(data);
     return Array.isArray(data) ? data : [];
   };
 
