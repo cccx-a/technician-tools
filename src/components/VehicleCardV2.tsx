@@ -144,47 +144,47 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
 
 
 
-  const getModeLabel = (mode: number) => {
-    switch (mode) {
-      case 0:
-        return "ปิดใช้งาน";
-      case 1:
-        return "ทำงานปกติ";
-      case 2:
-        return "หยุด รีเลย์ 1 (ยกงา)";
-      case 3:
-        return "หยุด รีเลย์ 2 (ยกงา+เคลื่อนที่)";
-      case 4:
-        return "เปิดใข้สัญญาณรถ";
-      case 5:
-        return "⚠️ Credit ใกล้หมด";
-      case 6:
-        return "PM";
-      default:
-        return `Mode ${mode}`;
-    }
-  };
+  // const getModeLabel = (mode: number) => {
+  //   switch (mode) {
+  //     case 0:
+  //       return "ปิดใช้งาน";
+  //     case 1:
+  //       return "ทำงานปกติ";
+  //     case 2:
+  //       return "หยุด รีเลย์ 1 (ยกงา)";
+  //     case 3:
+  //       return "หยุด รีเลย์ 2 (ยกงา+เคลื่อนที่)";
+  //     case 4:
+  //       return "เปิดใข้สัญญาณรถ";
+  //     case 5:
+  //       return "⚠️ Credit ใกล้หมด";
+  //     case 6:
+  //       return "PM";
+  //     default:
+  //       return `Mode ${mode}`;
+  //   }
+  // };
 
-  const getModeStyle = (mode: number) => {
-    switch (mode) {
-      case 0:
-        return "bg-red-100 text-red-700 border-red-300";
-      case 1:
-        return "bg-green-100 text-green-700 border-green-300";
-      case 2:
-        return "bg-yellow-100 text-yellow-700 border-yellow-300";
-      case 3:
-        return "bg-orange-100 text-orange-700 border-orange-300";
-      case 4:
-        return "bg-green-100 text-green-700 border-green-300";
-      case 5:
-        return "bg-red-100 text-red-700 border-red-300";
-      case 6:
-        return "bg-purple-100 text-purple-700 border-purple-300";
-      default:
-        return "bg-gray-100 text-gray-600 border-gray-300";
-    }
-  };
+  // const getModeStyle = (mode: number) => {
+  //   switch (mode) {
+  //     case 0:
+  //       return "bg-red-100 text-red-700 border-red-300";
+  //     case 1:
+  //       return "bg-green-100 text-green-700 border-green-300";
+  //     case 2:
+  //       return "bg-yellow-100 text-yellow-700 border-yellow-300";
+  //     case 3:
+  //       return "bg-orange-100 text-orange-700 border-orange-300";
+  //     case 4:
+  //       return "bg-green-100 text-green-700 border-green-300";
+  //     case 5:
+  //       return "bg-red-100 text-red-700 border-red-300";
+  //     case 6:
+  //       return "bg-purple-100 text-purple-700 border-purple-300";
+  //     default:
+  //       return "bg-gray-100 text-gray-600 border-gray-300";
+  //   }
+  // };
 
   const handleApproveVehicle = async () => {
     const result = await Swal.fire({
