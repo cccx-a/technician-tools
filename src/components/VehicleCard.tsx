@@ -242,8 +242,9 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
         <div class="flex items-start justify-between gap-4 mb-3">
           <div class="flex-1 min-w-0">
             <h3
-              class={`text-lg font-bold text-text-primary mb-1 cursor-pointer hover:text-accent transition-colors flex items-center gap-2 ${isSerialExpanded() ? "whitespace-normal break-all" : "truncate"
-                }`}
+              class={`text-lg font-bold text-text-primary mb-1 cursor-pointer hover:text-accent transition-colors flex items-center gap-2 ${
+                isSerialExpanded() ? "whitespace-normal break-all" : "truncate"
+              }`}
               onClick={() => setIsSerialExpanded(!isSerialExpanded())}
               title={props.vehicle.serial_number}
             >
@@ -253,22 +254,24 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
               {props.vehicle.serial_number}
             </h3>
             <p
-              class={`text-sm text-text-secondary cursor-pointer hover:text-text-primary transition-colors ${isExpanded() ? "whitespace-normal" : "truncate"
-                }`}
+              class={`text-sm text-text-secondary cursor-pointer hover:text-text-primary transition-colors ${
+                isExpanded() ? "whitespace-normal" : "truncate"
+              }`}
               onClick={() => setIsExpanded(!isExpanded())}
-              title={props.vehicle.model}
+              title={String(props.vehicle.model)}
             >
               {props.vehicle.model}
             </p>
           </div>
 
           <span
-            class={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide border ${props.vehicle.status === "active"
-              ? "bg-green-50 text-green-700 border-green-200"
-              : props.vehicle.status === "maintenance"
-                ? "bg-yellow-50 text-yellow-700 border-yellow-200"
-                : "bg-red-50 text-red-700 border-red-200"
-              }`}
+            class={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide border ${
+              props.vehicle.status === "active"
+                ? "bg-green-50 text-green-700 border-green-200"
+                : props.vehicle.status === "maintenance"
+                  ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                  : "bg-red-50 text-red-700 border-red-200"
+            }`}
           >
             {props.vehicle.status === "active"
               ? t("status_active")
@@ -295,16 +298,18 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
             </span>
           )}
           <span
-            class={`tour-status-badge inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border ${status() === "connected"
-              ? "bg-green-50 text-green-700 border-green-200"
-              : "bg-gray-100 text-gray-600 border-gray-200"
-              }`}
+            class={`tour-status-badge inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border ${
+              status() === "connected"
+                ? "bg-green-50 text-green-700 border-green-200"
+                : "bg-gray-100 text-gray-600 border-gray-200"
+            }`}
           >
             <div
-              class={`w-1.5 h-1.5 rounded-full ${isOnline()
-                ? "bg-green-500 animate-pulse shadow-[0_0_8px_rgba(76,175,80,0.6)]"
-                : "bg-gray-400"
-                }`}
+              class={`w-1.5 h-1.5 rounded-full ${
+                isOnline()
+                  ? "bg-green-500 animate-pulse shadow-[0_0_8px_rgba(76,175,80,0.6)]"
+                  : "bg-gray-400"
+              }`}
             ></div>
             {status() === "connected" ? t("connected") : t("offline")}
           </span>
@@ -318,19 +323,22 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
             <div class="flex items-center gap-2">
               <div class="relative flex h-2.5 w-2.5">
                 <span
-                  class={`absolute inline-flex h-full w-full rounded-full ${parsedData()
-                    ? "animate-ping bg-green-400 opacity-75"
-                    : "bg-yellow-400 opacity-40"
-                    }`}
+                  class={`absolute inline-flex h-full w-full rounded-full ${
+                    parsedData()
+                      ? "animate-ping bg-green-400 opacity-75"
+                      : "bg-yellow-400 opacity-40"
+                  }`}
                 ></span>
                 <span
-                  class={`relative inline-flex rounded-full h-2.5 w-2.5 ${parsedData() ? "bg-green-500" : "bg-yellow-500"
-                    }`}
+                  class={`relative inline-flex rounded-full h-2.5 w-2.5 ${
+                    parsedData() ? "bg-green-500" : "bg-yellow-500"
+                  }`}
                 ></span>
               </div>
               <span
-                class={`text-xs font-semibold uppercase tracking-wide ${parsedData() ? "text-green-600" : "text-yellow-600"
-                  }`}
+                class={`text-xs font-semibold uppercase tracking-wide ${
+                  parsedData() ? "text-green-600" : "text-yellow-600"
+                }`}
               >
                 {parsedData() ? t("live_telemetry") : t("waiting")}
               </span>
@@ -346,10 +354,11 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
             <div class="grid grid-cols-2 gap-3">
               {/* Mode */}
               <div
-                class={`bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 ${dataChanged()["mode"]
-                  ? "ring-2 ring-orange-300 shadow-lg shadow-orange-100 scale-105"
-                  : ""
-                  }`}
+                class={`bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 ${
+                  dataChanged()["mode"]
+                    ? "ring-2 ring-orange-300 shadow-lg shadow-orange-100 scale-105"
+                    : ""
+                }`}
               >
                 <div class="flex items-center gap-2 mb-2">
                   <span class="text-lg">⚙️</span>
@@ -362,9 +371,11 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                     {parsedData()?.mode}
                   </span>
                   <span
-                    class={`text-[10px] px-2 py-1 rounded border w-fit font-medium ${getModeInfo(parsedData()!.mode).bg
-                      } ${getModeInfo(parsedData()!.mode).color} ${getModeInfo(parsedData()!.mode).border
-                      }`}
+                    class={`text-[10px] px-2 py-1 rounded border w-fit font-medium ${
+                      getModeInfo(parsedData()!.mode).bg
+                    } ${getModeInfo(parsedData()!.mode).color} ${
+                      getModeInfo(parsedData()!.mode).border
+                    }`}
                   >
                     {getModeInfo(parsedData()!.mode).label}
                   </span>
@@ -373,10 +384,11 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
 
               {/* Temperature */}
               <div
-                class={`bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 ${dataChanged()["temp"]
-                  ? "ring-2 ring-orange-300 shadow-lg shadow-orange-100 scale-105"
-                  : ""
-                  }`}
+                class={`bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 ${
+                  dataChanged()["temp"]
+                    ? "ring-2 ring-orange-300 shadow-lg shadow-orange-100 scale-105"
+                    : ""
+                }`}
               >
                 <div class="flex items-center gap-2 mb-2">
                   <span class="text-lg">🌡️</span>
@@ -392,12 +404,13 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                 </div>
                 <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    class={`h-full rounded-full transition-all duration-500 ${parsedData()!.temp > 40
-                      ? "bg-red-500"
-                      : parsedData()!.temp > 30
-                        ? "bg-orange-500"
-                        : "bg-green-500"
-                      }`}
+                    class={`h-full rounded-full transition-all duration-500 ${
+                      parsedData()!.temp > 40
+                        ? "bg-red-500"
+                        : parsedData()!.temp > 30
+                          ? "bg-orange-500"
+                          : "bg-green-500"
+                    }`}
                     style={`width: ${Math.min(100, (parsedData()!.temp / 50) * 100)}%`}
                   ></div>
                 </div>
@@ -405,10 +418,11 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
 
               {/* Voltage */}
               <div
-                class={`bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 ${dataChanged()["voltage"]
-                  ? "ring-2 ring-yellow-300 shadow-lg shadow-yellow-100 scale-105"
-                  : ""
-                  }`}
+                class={`bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 ${
+                  dataChanged()["voltage"]
+                    ? "ring-2 ring-yellow-300 shadow-lg shadow-yellow-100 scale-105"
+                    : ""
+                }`}
               >
                 <div class="flex items-center gap-2 mb-2">
                   <span class="text-lg">⚡</span>
@@ -424,12 +438,13 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                 </div>
                 <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    class={`h-full rounded-full transition-all duration-500 ${parsedData()!.voltage < 20
-                      ? "bg-red-500"
-                      : parsedData()!.voltage < 22
-                        ? "bg-yellow-500"
-                        : "bg-green-500"
-                      }`}
+                    class={`h-full rounded-full transition-all duration-500 ${
+                      parsedData()!.voltage < 20
+                        ? "bg-red-500"
+                        : parsedData()!.voltage < 22
+                          ? "bg-yellow-500"
+                          : "bg-green-500"
+                    }`}
                     style={`width: ${Math.min(100, (parsedData()!.voltage / 30) * 100)}%`}
                   ></div>
                 </div>
@@ -437,10 +452,11 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
 
               {/* Session Usage */}
               <div
-                class={`bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 ${dataChanged()["session_usage"]
-                  ? "ring-2 ring-purple-300 shadow-lg shadow-purple-100 scale-105"
-                  : ""
-                  }`}
+                class={`bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 ${
+                  dataChanged()["session_usage"]
+                    ? "ring-2 ring-purple-300 shadow-lg shadow-purple-100 scale-105"
+                    : ""
+                }`}
               >
                 <div class="flex items-center gap-2 mb-2">
                   <span class="text-lg">⏱️</span>
@@ -462,10 +478,11 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
 
               {/* Total Usage Time */}
               <div
-                class={`col-span-2 bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 ${dataChanged()["total_usage_time"]
-                  ? "ring-2 ring-cyan-300 shadow-lg shadow-cyan-100 scale-105"
-                  : ""
-                  }`}
+                class={`col-span-2 bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 ${
+                  dataChanged()["total_usage_time"]
+                    ? "ring-2 ring-cyan-300 shadow-lg shadow-cyan-100 scale-105"
+                    : ""
+                }`}
               >
                 <div class="flex items-center gap-2 mb-2">
                   <span class="text-lg">📊</span>
@@ -522,10 +539,11 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                     <div class="px-3 py-2 hover:bg-white transition-colors">
                       <div class="flex items-center gap-2">
                         <div
-                          class={`w-6 h-6 rounded-md flex items-center justify-center ${isOpen
-                            ? "bg-green-50 text-green-600"
-                            : "bg-red-50 text-red-600"
-                            }`}
+                          class={`w-6 h-6 rounded-md flex items-center justify-center ${
+                            isOpen
+                              ? "bg-green-50 text-green-600"
+                              : "bg-red-50 text-red-600"
+                          }`}
                         >
                           <svg
                             class="w-3 h-3"
