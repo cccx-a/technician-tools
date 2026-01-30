@@ -3,6 +3,7 @@ import {
   createSignal,
   onCleanup,
   createEffect,
+  onMount,
 } from "solid-js";
 import type { Vehicle } from "../types";
 import { api } from "../services/api";
@@ -26,6 +27,13 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
   const [, setLastUpdate] = createSignal<Date | null>(null);
 
   let heartbeatTimeout: number;
+
+  const [showCursor, setShowCursor] = createSignal(false);
+
+  onMount(() => {
+    setTimeout(() => setShowCursor(true), 500);
+    setTimeout(() => setShowCursor(false), 3500);
+  });
 
   const parsedData = () => {
     const data = latestData();
@@ -134,13 +142,7 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
     });
   };
 
-  // Helper to format time seconds -> HH:MM:SS
-  // const formatTime = (seconds: number) => {
-  //     const h = Math.floor(seconds / 3600);
-  //     const m = Math.floor((seconds % 3600) / 60);
-  //     const s = seconds % 60;
-  //     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-  // };
+
 
   const getModeLabel = (mode: number) => {
     switch (mode) {
@@ -184,45 +186,100 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
     }
   };
 
+  const handleApproveVehicle = async () => {
+    const result = await Swal.fire({
+      title: "ยืนยันการ QC รถคันนี้",
+      html: `คุณต้องการยืนยันว่ารถคันนี้ <br/><span class="text-orange-500 font-bold">(Serial Number: ${props.vehicle.serial_number})</span><br/>ใช้งานได้ปกติใช่หรือไม่?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#10b981",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "ใช่, ยืนยัน",
+      cancelButtonText: "ยกเลิก",
+      customClass: {
+        popup: "rounded-xl",
+        title: "text-lg font-bold text-gray-800",
+        confirmButton: "rounded-lg px-6 py-2",
+        cancelButton: "rounded-lg px-6 py-2"
+      }
+    });
+
+    if (result.isConfirmed) {
+      try {
+        console.log('Approving vehicle - m_id:', props.vehicle.m_id, 'fp_id:', props.vehicle.fp_id, 'serial_number:', props.vehicle.serial_number);
+        await api.approveVehicle(
+          props.vehicle.fp_id,
+          props.vehicle.serial_number,
+          props.vehicle.m_id,  // m_id for external API
+          props.vehicle.matching?.fb_id, // for history logging
+          props.vehicle.fp_id  // for history logging
+        );
+
+        await Swal.fire({
+          title: t("success_title") || "สำเร็จ",
+          text: "บันทึกสถานะเรียบร้อยแล้ว",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+          customClass: {
+            popup: "rounded-xl"
+          }
+        });
+      } catch (error) {
+        console.error("Error approving vehicle:", error);
+        await Swal.fire({
+          title: "เกิดข้อผิดพลาด",
+          text: "ไม่สามารถบันทึกสถานะได้ กรุณาลองใหม่อีกครั้ง",
+          icon: "error",
+          confirmButtonText: "ตกลง",
+          customClass: {
+            popup: "rounded-xl"
+          }
+        });
+      }
+    }
+  };
+
   return (
     <div
       id={props.id}
-      class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full transition-all duration-200 hover:shadow-xl"
+      class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full transition-all duration-200 hover:shadow-xl relative"
     >
-      {/* Card Header */}
-      <div class="px-4 py-3 border-b border-gray-100 flex justify-between items-center bg-white">
-        <label class="font-bold text-sm text-gray-700">
-          {props.vehicle.model || "คันกลาง"}
+
+      <div class="px-4 py-3 border-b border-gray-100 flex justify-between items-center bg-white gap-2">
+        <label
+          class="font-bold text-sm text-gray-700 truncate cursor-pointer hover:text-blue-600 transition-colors"
+          title={String(props.vehicle.product_name || props.vehicle.model || "คันกลาง")}
+          onClick={() => {
+            Swal.fire({
+              title: String(props.vehicle.product_name || props.vehicle.model || "คันกลาง"),
+              text: "ชื่อรุ่นรถเต็ม",
+              confirmButtonText: "ตกลง",
+              confirmButtonColor: "#3b82f6",
+              customClass: {
+                popup: "rounded-xl",
+                title: "text-lg font-bold text-gray-800",
+                confirmButton: "rounded-lg px-6 py-2"
+              }
+            });
+          }}
+        >
+          {props.vehicle.product_name || String(props.vehicle.model) || "คันกลาง"}
         </label>
         <span
-          class={`badge px-2 py-0.5 rounded text-xs font-semibold ${
-            status() === "connected"
-              ? "bg-green-100 text-green-700 border border-green-200"
-              : "bg-gray-100 text-gray-500 border border-gray-200"
-          }`}
+          class={`badge px-3 py-1 rounded text-sm font-semibold whitespace-nowrap shrink-0 ${status() === "connected" && parsedData()?.mode !== 0
+            ? "bg-green-100 text-green-700 border border-green-200"
+            : "bg-gray-100 text-gray-500 border border-gray-200"
+            }`}
         >
-          {status() === "connected" ? "Connecting" : "Offline"}
+          {status() === "connected" && parsedData()?.mode !== 0 ? "เปิดใช้งาน" : "ปิดใช้งาน"}
         </span>
       </div>
 
       {/* Card Body */}
       <div class="p-4 flex-1 flex flex-col">
         <div class="space-y-2">
-          {/* Usage Time */}
-          {/* <p class="text-[15px] text-gray-700 flex justify-between">
-                        <span>เวลาการใช้งานสะสม:</span>
-                        <span class="text-[#ff8952] font-medium">
-                            {parsedData() ? formatTime(parsedData()!.total_usage_time) : "-"}
-                        </span>
-                    </p> */}
 
-          {/* Session Time */}
-          {/* <p class="text-[15px] text-gray-700 flex justify-between">
-                        <span>เวลาใช้งานในรอบนี้:</span>
-                        <span class="text-[#ff8952] font-medium">
-                            {parsedData() ? formatTime(parsedData()!.session_usage) : "-"}
-                        </span>
-                    </p> */}
 
           {/* Temperature */}
           <p class="text-[15px] text-gray-700 flex justify-between">
@@ -240,14 +297,35 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
             </span>
           </p>
 
-          {/* Status with colored badge */}
-          <div class="text-[15px] text-gray-700 flex justify-between items-center">
-            <span>สถานะ:</span>
-            <span
-              class={`px-2 py-0.5 rounded-md text-xs font-semibold border ${parsedData() ? getModeStyle(parsedData()!.mode) : "bg-gray-100 text-gray-500 border-gray-300"}`}
+          {/* Button approve product */}
+          <div class="mt-2 pt-2 border-t border-dashed border-gray-200 relative">
+            <button
+              onClick={handleApproveVehicle}
+              class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 hover:border-green-300 rounded-lg text-sm font-semibold transition-all duration-200 cursor-pointer "
             >
-              {parsedData() ? getModeLabel(parsedData()!.mode) : "-"}
-            </span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              ยืนยัน QC ผ่าน
+            </button>
+            {showCursor() && (
+              <div class="absolute inset-0 pointer-events-none z-50 flex items-center justify-center">
+                {/* Click Ripple Effect */}
+                <div class="absolute w-10 h-10 rounded-full bg-green-400 animate-click-ripple"></div>
+                {/* Virtual Cursor */}
+                {/* <div class="absolute animate-virtual-cursor" style="right: 30%; bottom: 30%;">
+                  <svg
+                    class="w-12 h-12 text-amber-500 drop-shadow-lg"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    style="filter: drop-shadow(2px 3px 3px rgba(0,0,0,0.4));"
+                  >
+                    <path d="M10.5 1.5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5a.75.75 0 01.75-.75zm4.5 0a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5a.75.75 0 01.75-.75zm-9.75 6a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5H6a.75.75 0 01-.75-.75zm12 0a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zm4.5-6.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5z" />
+                    <path d="M12 8.25a.75.75 0 01.75.75v2.25H15a.75.75 0 010 1.5h-2.25V15a.75.75 0 01-1.5 0v-2.25H9a.75.75 0 010-1.5h2.25V9a.75.75 0 01.75-.75z" />
+                  </svg>
+                </div> */}
+              </div>
+            )}
           </div>
         </div>
 
@@ -255,60 +333,42 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
         <div class="mt-4 text-center">
           <img
             src={props.vehicle.image || "/folklift-image-nobg.png"}
-            alt={props.vehicle.model}
+            alt={String(props.vehicle.product_name || props.vehicle.model)}
             class="w-[100px] h-[100px] object-contain mx-auto rounded-md"
             onError={(e) => (e.currentTarget.src = "/folklift-image-nobg.png")}
           />
         </div>
 
         {/* Serial Numbers */}
-        <div class="mt-4 mb-3 space-y-1">
-          <p class="text-sm text-gray-600 flex justify-between border-b border-dashed border-gray-200 pb-1">
+        <div class="mt-4 mb-3 space-y-2">
+          <p class="text-base text-gray-600 flex justify-between border-b border-dashed border-gray-200 pb-1">
             <span>S/N กล่อง:</span>
-            <span class="font-mono text-gray-800">
-              {props.vehicle.box_serial_number || "-"}
+            <span class="font-mono text-gray-800 font-medium">
+              {props.vehicle.fleet_box?.serial_number || props.vehicle.box_serial_number || "-"}
             </span>
           </p>
-          <p class="text-sm text-gray-600 flex justify-between">
+          <p class="text-base text-gray-600 flex justify-between">
             <span>S/N รถ:</span>
-            <span class="font-mono text-gray-800">
+            <span class="font-mono text-gray-800 font-medium">
               {props.vehicle.serial_number}
             </span>
           </p>
         </div>
 
-        {/* Controls */}
-        {/* <div class="space-y-3 mt-4 pt-3 border-t border-gray-100">
-                    <select
-                        class="w-full form-select px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-200 focus:border-orange-400 outline-none transition-all"
-                    >
-                        <option value="0">เลือกสถานะ</option>
-                        <option value="1">ทำงาน</option>
-                        <option value="2">หยุด รีเลย์ 1 ตัว (ยกงา)</option>
-                        <option value="3">หยุด รีเลย์ 2 ตัว (ยกงา, เคลื่อนที่)</option>
-                        <option value="4">Service รีเลย์ ปิดหมด (พวก maintenance)</option>
-                    </select>
 
-                    <a
-                        href={`/history?search=${props.vehicle.serial_number}`}
-                        class="w-full btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg shadow-sm transition-colors duration-200 text-center block"
-                    >
-                        ดูประวัติ
-                    </a>
-                </div> */}
 
         {/* Legacy Actions */}
-        <div class="space-y-3 mt-auto pt-3 border-t border-gray-100">
-          <div class="grid grid-cols-2 gap-3">
+        <div class="space-y-2 mt-auto pt-3 border-t border-gray-100">
+          <div class="grid grid-cols-2 gap-2">
             <button
               onClick={() => sendCommandLegacy(true)}
               disabled={!isMqttConnected()}
-              class="group rounded-lg border-2 border-border-primary hover:bg-green-50 hover:border-green-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed py-2.5"
+              class="group rounded-md border border-gray-200 hover:bg-green-50 hover:border-green-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed py-1.5"
             >
-              <div class="flex items-center justify-center gap-2">
+              <div class="flex items-center justify-center gap-1.5">
                 <div class="text-green-600 group-hover:scale-110 transition-all duration-200">
                   <svg
-                    class="w-5 h-5"
+                    class="w-4 h-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -321,7 +381,7 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
                     ></path>
                   </svg>
                 </div>
-                <span class="text-green-700 font-semibold text-sm">
+                <span class="text-green-700 font-medium text-xs">
                   {t("activate_vehicle")}
                 </span>
               </div>
@@ -330,12 +390,12 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
             <button
               onClick={() => sendCommandLegacy(false)}
               disabled={!isMqttConnected()}
-              class="group rounded-lg border-2 border-border-primary hover:bg-red-50 hover:border-red-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed py-2.5"
+              class="group rounded-md border border-gray-200 hover:bg-red-50 hover:border-red-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed py-1.5"
             >
-              <div class="flex items-center justify-center gap-2">
+              <div class="flex items-center justify-center gap-1.5">
                 <div class="text-red-600 group-hover:scale-110 transition-all duration-200">
                   <svg
-                    class="w-5 h-5"
+                    class="w-4 h-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -348,7 +408,7 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
                     ></path>
                   </svg>
                 </div>
-                <span class="text-red-600 font-semibold text-sm">
+                <span class="text-red-600 font-medium text-xs">
                   {t("deactivate_vehicle")}
                 </span>
               </div>
@@ -357,10 +417,10 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
 
           <a
             href={`/history?search=${props.vehicle.serial_number}`}
-            class="bg-accent flex items-center justify-center gap-2 py-3 text-sm font-semibold text-accent-text hover:bg-accent-hover rounded-lg transition-all duration-200 group shadow-sm"
+            class="flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-md border border-gray-200 transition-all duration-200"
           >
             <svg
-              class="w-4 h-4"
+              class="w-3.5 h-3.5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
