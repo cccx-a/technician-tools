@@ -52,6 +52,7 @@ export interface Vehicle {
     serial_number: string;
     model: number | string;
     model_code: number | string;
+    match_process: number;
 
     // Status and location
     status: number | 'active' | 'inactive' | 'maintenance';

@@ -30,6 +30,13 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
 
   const [showCursor, setShowCursor] = createSignal(false);
 
+  // Get user role from localStorage
+  const getUserRoleId = () => {
+    const userJson = localStorage.getItem('user');
+    const user = userJson ? JSON.parse(userJson) : null;
+    return user?.role_id || 0;
+  };
+
   onMount(() => {
     setTimeout(() => setShowCursor(true), 500);
     setTimeout(() => setShowCursor(false), 3500);
@@ -282,7 +289,7 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
 
 
           {/* Temperature */}
-          <p class="text-[15px] text-gray-700 flex justify-between">
+          <p class="text-[15px] text-gray-700 flex justify-between whitespace-nowrap">
             <span>อุณหภูมิ:</span>
             <span class="text-[#ff8952] font-medium">
               {parsedData() ? parsedData()!.temp : "-"}
@@ -297,36 +304,109 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
             </span>
           </p>
 
-          {/* Button approve product */}
-          <div class="mt-2 pt-2 border-t border-dashed border-gray-200 relative">
-            <button
-              onClick={handleApproveVehicle}
-              class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 hover:border-green-300 rounded-lg text-sm font-semibold transition-all duration-200 cursor-pointer "
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              ยืนยัน QC ผ่าน
-            </button>
-            {showCursor() && (
-              <div class="absolute inset-0 pointer-events-none z-50 flex items-center justify-center">
-                {/* Click Ripple Effect */}
-                <div class="absolute w-10 h-10 rounded-full bg-green-400 animate-click-ripple"></div>
-                {/* Virtual Cursor */}
-                {/* <div class="absolute animate-virtual-cursor" style="right: 30%; bottom: 30%;">
-                  <svg
-                    class="w-12 h-12 text-amber-500 drop-shadow-lg"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    style="filter: drop-shadow(2px 3px 3px rgba(0,0,0,0.4));"
-                  >
-                    <path d="M10.5 1.5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5a.75.75 0 01.75-.75zm4.5 0a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5a.75.75 0 01.75-.75zm-9.75 6a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5H6a.75.75 0 01-.75-.75zm12 0a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zm4.5-6.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5z" />
-                    <path d="M12 8.25a.75.75 0 01.75.75v2.25H15a.75.75 0 010 1.5h-2.25V15a.75.75 0 01-1.5 0v-2.25H9a.75.75 0 010-1.5h2.25V9a.75.75 0 01.75-.75z" />
-                  </svg>
-                </div> */}
+          {/* Match Process Status */}
+          {(() => {
+            const getMatchProcessLabel = (process: number) => {
+              switch (process) {
+                case 1: return "ส่งไปหา PDI";
+                case 2: return "PDI Assembly เสร็จ";
+                case 3: return "ส่งไปหา PDI QC";
+                case 4: return "สมบูรณ์";
+                default: return "รอดำเนินการ";
+              }
+            };
+
+            const getMatchProcessStyle = (process: number) => {
+              switch (process) {
+                case 1: return "bg-blue-100 text-blue-700 border-blue-300";
+                case 2: return "bg-yellow-100 text-yellow-700 border-yellow-300";
+                case 3: return "bg-orange-100 text-orange-700 border-orange-300";
+                case 4: return "bg-green-100 text-green-700 border-green-300";
+                default: return "bg-gray-100 text-gray-600 border-gray-300";
+              }
+            };
+
+            const getMatchProcessIcon = (process: number) => {
+              switch (process) {
+                case 1: return "📦";
+                case 2: return "🔧";
+                case 3: return "🔍";
+                case 4: return "✅";
+                default: return "⏳";
+              }
+            };
+
+            const matchProcess = props.vehicle.match_process || 0;
+
+            return (
+              <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
+                {/* Status Label and Badge - Stacked for consistency */}
+                <div class="flex flex-col gap-2">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-[13px] text-gray-600 shrink-0">สถานะ:</span>
+                    <span class={`px-2 py-0.5 rounded text-[11px] font-semibold border whitespace-nowrap ${getMatchProcessStyle(matchProcess)}`}>
+                      {getMatchProcessIcon(matchProcess)} {getMatchProcessLabel(matchProcess)}
+                    </span>
+                  </div>
+                  {/* Progress Steps */}
+                  <div class="flex items-center gap-0.5">
+                    {[1, 2, 3, 4].map((step) => (
+                      <div
+                        class={`flex-1 h-1 rounded-full transition-all duration-300 ${step <= matchProcess
+                          ? step === 4 ? "bg-green-500" : "bg-orange-400"
+                          : "bg-gray-200"
+                          }`}
+                      />
+                    ))}
+                  </div>
+                  {/* Step Labels */}
+                  <div class="flex justify-between text-[9px] text-gray-400 -mt-1">
+                    <span>PDI</span>
+                    <span>Assembly</span>
+                    <span>QC</span>
+                    <span>เสร็จ</span>
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
+            );
+          })()}
+
+          {/* Button approve product - Only show for role_id 18, only enabled when match_process === 2 */}
+          {getUserRoleId() === 18 && (
+            <div class="mt-2 pt-2 border-t border-dashed border-gray-200 relative">
+              {props.vehicle.match_process === 4 ? (
+                // Completed state - show success badge
+                <div class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-100 text-green-700 border-2 border-green-300 rounded-lg text-sm font-bold">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+                  </svg>
+                  QC เสร็จสมบูรณ์
+                </div>
+              ) : (
+                // Button for waiting or ready states
+                <button
+                  onClick={handleApproveVehicle}
+                  disabled={props.vehicle.match_process !== 2}
+                  class={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${props.vehicle.match_process === 2
+                    ? "bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 hover:border-green-300 cursor-pointer"
+                    : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed opacity-60"
+                    }`}
+                  title={props.vehicle.match_process !== 2 ? "ต้องรอ PDI Assembly เสร็จก่อนถึงจะทำ QC ได้" : ""}
+                >
+                  {/* <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg> */}
+                  {props.vehicle.match_process === 2 ? "ยืนยัน QC ผ่าน" : props.vehicle.match_process === 3 ? "รอตรวจ QC" : "รอ PDI Assembly เสร็จ"}
+                </button>
+              )}
+              {showCursor() && props.vehicle.match_process === 2 && (
+                <div class="absolute inset-0 pointer-events-none z-50 flex items-center justify-center">
+                  {/* Click Ripple Effect */}
+                  <div class="absolute w-10 h-10 rounded-full bg-green-400 animate-click-ripple"></div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Image */}
@@ -436,7 +516,7 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
           </a>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 
