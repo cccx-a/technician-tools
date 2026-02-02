@@ -305,7 +305,7 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
           </p>
 
           {/* Match Process Status */}
-          {(() => {
+          {getUserRoleId() === 18 && (() => {
             const getMatchProcessLabel = (process: number) => {
               switch (process) {
                 case 1: return "ส่งไปหา PDI";
