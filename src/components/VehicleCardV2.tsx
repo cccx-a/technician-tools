@@ -442,7 +442,7 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
           <div class="grid grid-cols-2 gap-2">
             <button
               onClick={() => sendCommandLegacy(true)}
-              disabled={!isMqttConnected() || props.vehicle.match_process === 1}
+              disabled={!isMqttConnected() || props.vehicle.match_process !== 2 && props.vehicle.match_process !== 3 && props.vehicle.match_process !== 4}
               class="group rounded-md border border-gray-200 hover:bg-green-50 hover:border-green-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed py-1.5"
             >
               <div class="flex items-center justify-center gap-1.5">
@@ -469,7 +469,7 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
 
             <button
               onClick={() => sendCommandLegacy(false)}
-              disabled={!isMqttConnected() || props.vehicle.match_process === 1}
+              disabled={!isMqttConnected() || props.vehicle.match_process !== 2 && props.vehicle.match_process !== 3 && props.vehicle.match_process !== 4}
               class="group rounded-md border border-gray-200 hover:bg-red-50 hover:border-red-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed py-1.5"
             >
               <div class="flex items-center justify-center gap-1.5">
