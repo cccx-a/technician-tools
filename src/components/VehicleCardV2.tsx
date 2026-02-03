@@ -308,11 +308,11 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
           {getUserRoleId() === 18 && (() => {
             const getMatchProcessLabel = (process: number) => {
               switch (process) {
-                case 1: return "ส่งไปหา PDI";
-                case 2: return "PDI Assembly เสร็จ";
-                case 3: return "ส่งไปหา PDI QC";
-                case 4: return "สมบูรณ์";
-                default: return "รอดำเนินการ";
+                case 1: return "รอประกอบ";
+                case 2: return "ประกอบสำเร็จ";
+                case 3: return "รอ QC";
+                case 4: return "QC สำเร็จ";
+                default: return "รอ PDI Assembly ประกอบรถ";
               }
             };
 
@@ -361,10 +361,10 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
                   </div>
                   {/* Step Labels */}
                   <div class="flex justify-between text-[9px] text-gray-400 -mt-1">
-                    <span>PDI</span>
-                    <span>Assembly</span>
-                    <span>QC</span>
-                    <span>เสร็จ</span>
+                    <span>PDI Assembly</span>
+                    <span>PDI QC</span>
+                    <span>QC Waiting</span>
+                    <span>Complete</span>
                   </div>
                 </div>
               </div>
@@ -396,7 +396,7 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
                   {/* <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg> */}
-                  {props.vehicle.match_process === 2 ? "ยืนยัน QC ผ่าน" : props.vehicle.match_process === 3 ? "รอตรวจ QC" : "รอ PDI Assembly เสร็จ"}
+                  {props.vehicle.match_process === 2 ? "ยืนยัน QC ผ่าน" : props.vehicle.match_process === 3 ? "รอตรวจ QC" : "รอ PDI Assembly ประกอบรถ"}
                 </button>
               )}
               {showCursor() && props.vehicle.match_process === 2 && (
@@ -442,7 +442,7 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
           <div class="grid grid-cols-2 gap-2">
             <button
               onClick={() => sendCommandLegacy(true)}
-              disabled={!isMqttConnected()}
+              disabled={!isMqttConnected() || props.vehicle.match_process === 1}
               class="group rounded-md border border-gray-200 hover:bg-green-50 hover:border-green-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed py-1.5"
             >
               <div class="flex items-center justify-center gap-1.5">
@@ -469,7 +469,7 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
 
             <button
               onClick={() => sendCommandLegacy(false)}
-              disabled={!isMqttConnected()}
+              disabled={!isMqttConnected() || props.vehicle.match_process === 1}
               class="group rounded-md border border-gray-200 hover:bg-red-50 hover:border-red-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed py-1.5"
             >
               <div class="flex items-center justify-center gap-1.5">
