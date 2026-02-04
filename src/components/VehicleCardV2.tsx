@@ -125,7 +125,11 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
       status: isOpen ? 4 : 0,
     });
 
+    // ส่ง 2 ครั้งเพื่อป้องกัน message loss (QoS 0)
     mqttService.publish(topic, payload, { qos: 0 });
+    setTimeout(() => {
+      mqttService.publish(topic, payload, { qos: 0 });
+    }, 100);
 
     api.logAction(
       isOpen ? "OPEN_COMMAND" : "CLOSE_COMMAND",
