@@ -29,6 +29,9 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
   let heartbeatTimeout: number;
 
   const [showCursor, setShowCursor] = createSignal(false);
+  // Local override for match_process to update UI immediately after approval
+  const [matchProcessOverride, setMatchProcessOverride] = createSignal<number | null>(null);
+  const currentMatchProcess = () => matchProcessOverride() ?? props.vehicle.match_process;
 
   // Get user role from localStorage
   const getUserRoleId = () => {
@@ -226,6 +229,9 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
           props.vehicle.fp_id  // for history logging
         );
 
+        // Update local state immediately so UI reflects change without refresh
+        setMatchProcessOverride(3);
+
         await Swal.fire({
           title: t("success_title") || "สำเร็จ",
           text: "บันทึกสถานะเรียบร้อยแล้ว",
@@ -340,7 +346,7 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
               }
             };
 
-            const matchProcess = props.vehicle.match_process || 0;
+            const matchProcess = currentMatchProcess() || 0;
 
             return (
               <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
@@ -378,7 +384,7 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
           {/* Button approve product - Only show for role_id 18, only enabled when match_process === 2 */}
           {getUserRoleId() === 18 && (
             <div class="mt-2 pt-2 border-t border-dashed border-gray-200 relative">
-              {props.vehicle.match_process === 4 ? (
+              {currentMatchProcess() === 4 ? (
                 // Completed state - show success badge
                 <div class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-100 text-green-700 border-2 border-green-300 rounded-lg text-sm font-bold">
                   <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -390,20 +396,20 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
                 // Button for waiting or ready states
                 <button
                   onClick={handleApproveVehicle}
-                  disabled={props.vehicle.match_process !== 2}
-                  class={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${props.vehicle.match_process === 2
+                  disabled={currentMatchProcess() !== 2}
+                  class={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${currentMatchProcess() === 2
                     ? "bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 hover:border-green-300 cursor-pointer"
                     : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed opacity-60"
                     }`}
-                  title={props.vehicle.match_process !== 2 ? "ต้องรอ PDI Assembly เสร็จก่อนถึงจะทำ QC ได้" : ""}
+                  title={currentMatchProcess() !== 2 ? "ต้องรอ PDI Assembly เสร็จก่อนถึงจะทำ QC ได้" : ""}
                 >
                   {/* <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg> */}
-                  {props.vehicle.match_process === 2 ? "เปิดใช้สัญญาณรถ" : props.vehicle.match_process === 3 ? "รอตรวจ QC" : "รอ PDI Assembly ประกอบรถ"}
+                  {currentMatchProcess() === 2 ? "เปิดใช้สัญญาณรถ" : currentMatchProcess() === 3 ? "รอตรวจ QC" : "รอ PDI Assembly ประกอบรถ"}
                 </button>
               )}
-              {showCursor() && props.vehicle.match_process === 2 && (
+              {showCursor() && currentMatchProcess() === 2 && (
                 <div class="absolute inset-0 pointer-events-none z-50 flex items-center justify-center">
                   {/* Click Ripple Effect */}
                   <div class="absolute w-10 h-10 rounded-full bg-green-400 animate-click-ripple"></div>
