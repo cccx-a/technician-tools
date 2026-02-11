@@ -33,7 +33,6 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
     [key: string]: boolean;
   }>({});
 
-  // Fetch recent history for this vehicle
   const [recentHistory] = createResource(
     () => props.vehicle.serial_number,
     async (serialNumber) => {
@@ -46,7 +45,6 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
     },
   );
 
-  // Parse data array into structured object
   const parsedData = () => {
     const data = latestData();
     if (!data || data.length !== 5) return null;
@@ -64,7 +62,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
       const last = lastUpdate();
       if (last) {
         const diff = Math.floor((new Date().getTime() - last.getTime()) / 1000);
-        setTimeAgo(`${diff}s ${t("ago") || "ago"}`); // Fallback if ago is missing, though usually it's better to add it
+        setTimeAgo(`${diff}s ${t("ago") || "ago"}`);
       }
     }, 1000);
     onCleanup(() => clearInterval(interval));
@@ -86,7 +84,6 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
           const oldData = latestData();
           const newData = payload.data;
 
-          // Track which fields changed
           if (oldData && oldData.length === newData.length) {
             const changed: { [key: string]: boolean } = {};
             const fields = [
@@ -123,8 +120,6 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
   createEffect(() => {
     if (mqttSerialNumber) {
       mqttService.subscribe(heartbeatTopic, handleMessage);
-      // Don't set status here, rely on heartbeats.
-      // Setting it here based on broker status was causing false positives/negatives.
     }
 
     onCleanup(() => {
@@ -140,7 +135,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
       title: isOpen
         ? t("confirm_activate_title")
         : t("confirm_deactivate_title"),
-      text: isOpen ? t("confirm_activate_text") : t("confirm_deactivate_text"),
+      html: `${isOpen ? t("confirm_activate_text") : t("confirm_deactivate_text")}<br/><span class="text-orange-500 font-bold">(Serial Number: ${props.vehicle.serial_number})</span>`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: isOpen ? "#10b981" : "#f43f5e",
@@ -149,7 +144,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
       cancelButtonText: t("confirm_cancel"),
       customClass: {
         popup:
-          "!bg-secondary !text-text-primary border !border-border-primary rounded-2xl",
+          "!bg-secondary !text-text-primary border !border-border-primary rounded-xl",
         title: "!text-text-primary",
         htmlContainer: "!text-text-secondary",
       },
@@ -183,7 +178,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
       showConfirmButton: false,
       customClass: {
         popup:
-          "!bg-secondary !text-text-primary border !border-border-primary rounded-2xl",
+          "!bg-secondary !text-text-primary border !border-border-primary rounded-xl",
         title: "!text-text-primary",
         htmlContainer: "!text-text-secondary",
       },
@@ -195,37 +190,37 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
       case 0:
         return {
           label: t("offline"),
-          color: "text-gray-400",
-          bg: "bg-gray-500/10",
-          border: "border-gray-500/20",
+          color: "text-gray-600",
+          bg: "bg-gray-100",
+          border: "border-gray-300",
         };
       case 1:
         return {
           label: t("mode_working"),
-          color: "text-green-500",
-          bg: "bg-green-500/10",
-          border: "border-green-500/20",
+          color: "text-green-700",
+          bg: "bg-green-50",
+          border: "border-green-200",
         };
       case 2:
         return {
           label: t("mode_stop_relay1"),
-          color: "text-orange-500",
-          bg: "bg-orange-500/10",
-          border: "border-orange-500/20",
+          color: "text-orange-700",
+          bg: "bg-orange-50",
+          border: "border-orange-200",
         };
       case 3:
         return {
           label: t("mode_stop_relay2"),
-          color: "text-red-500",
-          bg: "bg-red-500/10",
-          border: "border-red-500/20",
+          color: "text-red-700",
+          bg: "bg-red-50",
+          border: "border-red-200",
         };
       case 6:
         return {
           label: t("mode_pm"),
-          color: "text-blue-500",
-          bg: "bg-blue-500/10",
-          border: "border-blue-500/20",
+          color: "text-blue-700",
+          bg: "bg-blue-50",
+          border: "border-blue-200",
         };
       default:
         return {
@@ -240,18 +235,20 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
   return (
     <div
       id={props.id}
-      class="bg-secondary rounded-2xl shadow-lg border border-border-primary hover:shadow-xl transition-all duration-300 overflow-hidden"
+      class="bg-secondary rounded-xl border border-border-primary transition-all duration-300 overflow-hidden hover:shadow-xl flex flex-col justify-between"
     >
       {/* Header Section */}
-      <div class="p-5 pb-4 border-b border-border-secondary/50">
+      <div class="p-5 border-b border-border-secondary">
         <div class="flex items-start justify-between gap-4 mb-3">
           <div class="flex-1 min-w-0">
             <h3
-              class={`text-2xl font-bold text-text-primary mb-1.5 cursor-pointer hover:text-accent transition-colors flex items-center gap-2 ${isSerialExpanded() ? "whitespace-normal break-all" : "truncate"}`}
+              class={`text-lg font-bold text-text-primary mb-1 cursor-pointer hover:text-accent transition-colors flex items-center gap-2 ${
+                isSerialExpanded() ? "whitespace-normal break-all" : "truncate"
+              }`}
               onClick={() => setIsSerialExpanded(!isSerialExpanded())}
               title={props.vehicle.serial_number}
             >
-              <span class="text-sm font-bold text-text-tertiary uppercase tracking-wider bg-tertiary/50 px-2 py-0.5 rounded border border-border-secondary/50">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wide  px-2 py-1 rounded border border-orange-200">
                 SN
               </span>
               {props.vehicle.serial_number}
@@ -261,19 +258,19 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                 isExpanded() ? "whitespace-normal" : "truncate"
               }`}
               onClick={() => setIsExpanded(!isExpanded())}
-              title={props.vehicle.model}
+              title={String(props.vehicle.model)}
             >
               {props.vehicle.model}
             </p>
           </div>
 
           <span
-            class={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide border ${
+            class={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide border ${
               props.vehicle.status === "active"
-                ? "bg-green-500/15 text-green-500 border-green-500/30"
+                ? "bg-green-50 text-green-700 border-green-200"
                 : props.vehicle.status === "maintenance"
-                  ? "bg-yellow-500/15 text-yellow-500 border-yellow-500/30"
-                  : "bg-red-500/15 text-red-500 border-red-500/30"
+                  ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                  : "bg-red-50 text-red-700 border-red-200"
             }`}
           >
             {props.vehicle.status === "active"
@@ -286,16 +283,16 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
 
         {/* Meta Information */}
         <div class="flex flex-wrap gap-2">
-          {props.vehicle.fleet_product?.fleet_name && (
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs bg-tertiary/80 text-text-secondary border border-border-secondary">
+          {/* {props.vehicle.fleet_product?.fleet_name && (
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs bg-gray-50 text-text-secondary border border-gray-200">
               <span class="opacity-70">🏢</span>
               {props.vehicle.fleet_product.fleet_name}
             </span>
-          )}
+          )} */}
           {props.vehicle.box_serial_number && (
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs bg-tertiary/80 text-text-tertiary border border-border-secondary font-mono">
-              <span class="text-[10px] font-bold uppercase tracking-wider bg-border-secondary/50 px-1.5 rounded text-text-secondary">
-                SN BOX
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs bg-secondary text-text-tertiary border border-gray-200 font-mono">
+              <span class="text-[10px] text-accent font-semibold uppercase tracking-wide bg-secondary px-1.5 py-0.5 rounded border border-secondary">
+                BOX
               </span>
               {props.vehicle.box_serial_number}
             </span>
@@ -303,14 +300,14 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
           <span
             class={`tour-status-badge inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border ${
               status() === "connected"
-                ? "bg-green-500/15 text-green-500 border-green-500/30"
-                : "bg-gray-500/15 text-gray-500 border-gray-500/30"
+                ? "bg-green-50 text-green-700 border-green-200"
+                : "bg-gray-100 text-gray-600 border-gray-200"
             }`}
           >
             <div
               class={`w-1.5 h-1.5 rounded-full ${
                 isOnline()
-                  ? "bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"
+                  ? "bg-green-500 animate-pulse shadow-[0_0_8px_rgba(76,175,80,0.6)]"
                   : "bg-gray-400"
               }`}
             ></div>
@@ -321,8 +318,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
 
       {/* Live Data Section */}
       {isOnline() && (
-        <div class="px-5 py-4 to-emerald-500/5 border-b border-border-secondary/30">
-          {/* <div class="px-5 py-4 bg-gradient-to-br from-green-500/5 to-emerald-500/5 border-b border-border-secondary/30"> */}
+        <div class="px-5 py-4 bg-gradient-to-br from-orange-50/30 to-transparent border-b border-border-secondary">
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center gap-2">
               <div class="relative flex h-2.5 w-2.5">
@@ -340,15 +336,15 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                 ></span>
               </div>
               <span
-                class={`text-xs font-bold uppercase tracking-wider ${
-                  parsedData() ? "text-green-500" : "text-yellow-500"
+                class={`text-xs font-semibold uppercase tracking-wide ${
+                  parsedData() ? "text-green-600" : "text-yellow-600"
                 }`}
               >
                 {parsedData() ? t("live_telemetry") : t("waiting")}
               </span>
             </div>
             {parsedData() && (
-              <span class="text-[10px] text-text-tertiary font-mono bg-background/50 px-2 py-0.5 rounded">
+              <span class="text-[10px] text-text-tertiary font-mono bg-white px-2 py-1 rounded border border-gray-200">
                 {timeAgo()}
               </span>
             )}
@@ -358,24 +354,28 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
             <div class="grid grid-cols-2 gap-3">
               {/* Mode */}
               <div
-                class={`bg-background/60 rounded-lg p-3 border border-border-secondary/50 transition-all duration-300 ${
+                class={`bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 ${
                   dataChanged()["mode"]
-                    ? "ring-2 ring-blue-500/50 shadow-lg shadow-blue-500/20 scale-105"
+                    ? "ring-2 ring-orange-300 shadow-lg shadow-orange-100 scale-105"
                     : ""
                 }`}
               >
-                <div class="flex items-center gap-2 mb-1">
+                <div class="flex items-center gap-2 mb-2">
                   <span class="text-lg">⚙️</span>
-                  <span class="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold">
+                  <span class="text-[10px] text-text-tertiary uppercase tracking-wide font-semibold">
                     {t("mode")}
                   </span>
                 </div>
-                <div class="flex flex-col">
-                  <span class="text-2xl font-bold text-text-primary font-mono leading-none mb-1">
+                <div class="flex flex-col gap-1">
+                  <span class="text-2xl font-bold text-text-primary font-mono">
                     {parsedData()?.mode}
                   </span>
                   <span
-                    class={`text-[10px] px-1.5 py-0.5 rounded border w-fit ${getModeInfo(parsedData()!.mode).bg} ${getModeInfo(parsedData()!.mode).color} ${getModeInfo(parsedData()!.mode).border}`}
+                    class={`text-[10px] px-2 py-1 rounded border w-fit font-medium ${
+                      getModeInfo(parsedData()!.mode).bg
+                    } ${getModeInfo(parsedData()!.mode).color} ${
+                      getModeInfo(parsedData()!.mode).border
+                    }`}
                   >
                     {getModeInfo(parsedData()!.mode).label}
                   </span>
@@ -384,25 +384,25 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
 
               {/* Temperature */}
               <div
-                class={`bg-background/60 rounded-lg p-3 border border-border-secondary/50 transition-all duration-300 ${
+                class={`bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 ${
                   dataChanged()["temp"]
-                    ? "ring-2 ring-orange-500/50 shadow-lg shadow-orange-500/20 scale-105"
+                    ? "ring-2 ring-orange-300 shadow-lg shadow-orange-100 scale-105"
                     : ""
                 }`}
               >
-                <div class="flex items-center gap-2 mb-1">
+                <div class="flex items-center gap-2 mb-2">
                   <span class="text-lg">🌡️</span>
-                  <span class="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold">
+                  <span class="text-[10px] text-text-tertiary uppercase tracking-wide font-semibold">
                     {t("temperature")}
                   </span>
                 </div>
-                <div class="flex items-baseline gap-1">
+                <div class="flex items-baseline gap-1 mb-2">
                   <span class="text-2xl font-bold text-text-primary font-mono">
                     {parsedData()?.temp}
                   </span>
                   <span class="text-sm text-text-secondary">°C</span>
                 </div>
-                <div class="mt-1 h-1.5 bg-border-secondary/30 rounded-full overflow-hidden">
+                <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
                     class={`h-full rounded-full transition-all duration-500 ${
                       parsedData()!.temp > 40
@@ -418,25 +418,25 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
 
               {/* Voltage */}
               <div
-                class={`bg-background/60 rounded-lg p-3 border border-border-secondary/50 transition-all duration-300 ${
+                class={`bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 ${
                   dataChanged()["voltage"]
-                    ? "ring-2 ring-yellow-500/50 shadow-lg shadow-yellow-500/20 scale-105"
+                    ? "ring-2 ring-yellow-300 shadow-lg shadow-yellow-100 scale-105"
                     : ""
                 }`}
               >
-                <div class="flex items-center gap-2 mb-1">
+                <div class="flex items-center gap-2 mb-2">
                   <span class="text-lg">⚡</span>
-                  <span class="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold">
+                  <span class="text-[10px] text-text-tertiary uppercase tracking-wide font-semibold">
                     {t("voltage")}
                   </span>
                 </div>
-                <div class="flex items-baseline gap-1">
+                <div class="flex items-baseline gap-1 mb-2">
                   <span class="text-2xl font-bold text-text-primary font-mono">
                     {parsedData()?.voltage}
                   </span>
                   <span class="text-sm text-text-secondary">V</span>
                 </div>
-                <div class="mt-1 h-1.5 bg-border-secondary/30 rounded-full overflow-hidden">
+                <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
                     class={`h-full rounded-full transition-all duration-500 ${
                       parsedData()!.voltage < 20
@@ -452,15 +452,15 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
 
               {/* Session Usage */}
               <div
-                class={`bg-background/60 rounded-lg p-3 border border-border-secondary/50 transition-all duration-300 ${
+                class={`bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 ${
                   dataChanged()["session_usage"]
-                    ? "ring-2 ring-purple-500/50 shadow-lg shadow-purple-500/20 scale-105"
+                    ? "ring-2 ring-purple-300 shadow-lg shadow-purple-100 scale-105"
                     : ""
                 }`}
               >
-                <div class="flex items-center gap-2 mb-1">
+                <div class="flex items-center gap-2 mb-2">
                   <span class="text-lg">⏱️</span>
-                  <span class="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold">
+                  <span class="text-[10px] text-text-tertiary uppercase tracking-wide font-semibold">
                     {t("session")}
                   </span>
                 </div>
@@ -478,15 +478,15 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
 
               {/* Total Usage Time */}
               <div
-                class={`col-span-2 bg-background/60 rounded-lg p-3 border border-border-secondary/50 transition-all duration-300 ${
+                class={`col-span-2 bg-white rounded-lg p-3 border border-gray-200 transition-all duration-300 ${
                   dataChanged()["total_usage_time"]
-                    ? "ring-2 ring-cyan-500/50 shadow-lg shadow-cyan-500/20 scale-105"
+                    ? "ring-2 ring-cyan-300 shadow-lg shadow-cyan-100 scale-105"
                     : ""
                 }`}
               >
-                <div class="flex items-center gap-2 mb-1">
+                <div class="flex items-center gap-2 mb-2">
                   <span class="text-lg">📊</span>
-                  <span class="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold">
+                  <span class="text-[10px] text-text-tertiary uppercase tracking-wide font-semibold">
                     {t("total_usage_time")}
                   </span>
                 </div>
@@ -503,7 +503,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                   <span class="text-sm text-text-secondary">
                     {t("seconds")}
                   </span>
-                  <span class="ml-auto text-xs text-text-tertiary bg-tertiary/50 px-2 py-1 rounded">
+                  <span class="ml-auto text-xs text-text-tertiary bg-gray-50 px-2 py-1 rounded border border-gray-200">
                     {(parsedData()!.total_usage_time / 3600).toFixed(2)}{" "}
                     {t("hours") || "hrs"}
                   </span>
@@ -511,7 +511,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
               </div>
             </div>
           ) : (
-            <div class="font-mono text-xs text-text-secondary bg-background/60 px-3 py-2.5 rounded-lg border border-border-secondary/50 text-center">
+            <div class="font-mono text-xs text-text-secondary bg-white px-3 py-2.5 rounded-lg border border-gray-200 text-center">
               {t("listening_heartbeat")}
             </div>
           )}
@@ -520,29 +520,29 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
 
       {/* Recent History Section */}
       {recentHistory() && recentHistory()!.data.length > 0 && (
-        <div class="px-5 pb-3">
-          <div class="bg-tertiary/30 rounded-xl border border-border-secondary/50 overflow-hidden">
-            <div class="px-3 py-2 border-b border-border-secondary/50 flex items-center justify-center">
-              <span class="text-xs font-bold text-text-secondary uppercase tracking-wider">
+        <div class="px-5 py-3">
+          <div class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+            <div class="px-3 py-2 border-b border-gray-200 flex items-center">
+              <span class="text-xs font-semibold text-text-secondary uppercase tracking-wide">
                 {t("recent_activity")}
               </span>
-              <span class="text-[10px] text-text-tertiary bg-background/50 px-2 py-0.5 rounded ml-auto">
+              <span class="text-[10px] text-text-tertiary bg-white px-2 py-0.5 rounded border border-gray-200 ml-auto">
                 {recentHistory()!.meta.total} {t("total")}
               </span>
             </div>
-            <div class="divide-y divide-border-secondary/30">
+            <div class="divide-y divide-gray-200">
               {recentHistory()!
                 .data.slice(0, 3)
                 .map((log: HistoryLog) => {
                   const isOpen = log.action.includes("OPEN");
                   return (
-                    <div class="px-3 py-2 hover:bg-background/30 transition-colors">
+                    <div class="px-3 py-2 hover:bg-white transition-colors">
                       <div class="flex items-center gap-2">
                         <div
                           class={`w-6 h-6 rounded-md flex items-center justify-center ${
                             isOpen
-                              ? "bg-emerald-500/10 text-emerald-500"
-                              : "bg-rose-500/10 text-rose-500"
+                              ? "bg-green-50 text-green-600"
+                              : "bg-red-50 text-red-600"
                           }`}
                         >
                           <svg
@@ -598,16 +598,15 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
       )}
 
       {/* Action Section */}
-      <div class="p-5 space-y-4">
-        <div class="tour-controls grid grid-cols-2 gap-4">
+      <div class="p-5 space-y-3">
+        <div class="tour-controls grid grid-cols-2 gap-3">
           <button
             onClick={() => sendCommand(true)}
             disabled={!isMqttConnected()}
-            class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-500/10 to-emerald-600/10 border border-emerald-500/20 hover:border-emerald-500/40 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+            class="group rounded-lg border-2 border-border-primary hover:bg-green-50 hover:border-green-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed py-2.5"
           >
-            <div class="absolute inset-0 bg-emerald-500/0 group-hover:bg-emerald-500/5 transition-colors duration-300"></div>
-            <div class="relative p-4 flex flex-col items-center gap-2">
-              <div class="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform duration-300">
+            <div class="flex items-center justify-center gap-2">
+              <div class="text-green-600 group-hover:scale-110 transition-all duration-200">
                 <svg
                   class="w-5 h-5"
                   fill="none"
@@ -622,11 +621,8 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                   ></path>
                 </svg>
               </div>
-              <span class="text-emerald-600 font-bold text-sm">
+              <span class="text-green-700 font-semibold text-sm">
                 {t("activate_vehicle")}
-              </span>
-              <span class="text-[10px] text-emerald-600/60 uppercase tracking-wider font-medium">
-                {t("activate")}
               </span>
             </div>
           </button>
@@ -634,11 +630,10 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
           <button
             onClick={() => sendCommand(false)}
             disabled={!isMqttConnected()}
-            class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-rose-500/10 to-rose-600/10 border border-rose-500/20 hover:border-rose-500/40 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+            class="group rounded-lg border-2 border-border-primary hover:bg-red-50 hover:border-red-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed py-2.5"
           >
-            <div class="absolute inset-0 bg-rose-500/0 group-hover:bg-rose-500/5 transition-colors duration-300"></div>
-            <div class="relative p-4 flex flex-col items-center gap-2">
-              <div class="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-500 group-hover:scale-110 transition-transform duration-300">
+            <div class="flex items-center justify-center gap-2">
+              <div class="text-red-600 group-hover:scale-110 transition-all duration-200">
                 <svg
                   class="w-5 h-5"
                   fill="none"
@@ -653,11 +648,8 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
                   ></path>
                 </svg>
               </div>
-              <span class="text-rose-600 font-bold text-sm">
+              <span class="text-red-600 font-semibold text-sm">
                 {t("deactivate_vehicle")}
-              </span>
-              <span class="text-[10px] text-rose-600/60 uppercase tracking-wider font-medium">
-                {t("deactivate")}
               </span>
             </div>
           </button>
@@ -665,10 +657,10 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
 
         <a
           href={`/history?search=${props.vehicle.serial_number}`}
-          class="tour-history-link flex items-center justify-center gap-2 py-3 text-sm font-medium text-text-secondary hover:text-accent hover:bg-tertiary/50 rounded-xl transition-all duration-200 border border-transparent hover:border-border-secondary group"
+          class="bg-accent tour-history-link flex items-center justify-center gap-2 py-3 text-sm font-semibold text-accent-text hover:bg-accent-hover rounded-lg transition-all duration-200 group shadow-sm"
         >
           <svg
-            class="w-4 h-4 text-text-tertiary group-hover:text-accent transition-colors"
+            class="w-4 h-4"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -686,7 +678,7 @@ const VehicleCard: Component<VehicleCardProps> = (props) => {
 
       {/* Command Feedback */}
       {lastCommand() && (
-        <div class="absolute top-4 right-4 bg-accent text-accent-text px-4 py-2 rounded-full text-xs font-bold shadow-lg animate-bounce z-20 flex items-center gap-2">
+        <div class="absolute top-4 right-4 bg-accent text-accent-text px-4 py-2 rounded-lg text-xs font-semibold shadow-lg animate-bounce z-20 flex items-center gap-2">
           <span>{lastCommand()}</span>
           <svg
             class="w-4 h-4"

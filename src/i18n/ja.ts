@@ -13,6 +13,7 @@ export const dict = {
   technician_dashboard: "技術者ダッシュボード",
   search_placeholder: "車両を検索 (SN/モデル)...",
   global_history: "グローバル履歴",
+  open_close_history: "開閉履歴",
   fleet_dashboard: "フリートダッシュボード",
   failed_load: "車両の読み込みに失敗しました",
   retry: "再試行",
@@ -130,6 +131,7 @@ export const dict = {
     "これらのコントロールを使用して、履歴記録のページを移動します。",
   // Pagination
   items_per_page: "表示件数",
+  jump_to: "ページへ移動",
   // Confirmation Dialogs
   confirm_activate_title: "車両を有効化しますか？",
   confirm_activate_text: "本当にこの車両を有効化してもよろしいですか？",

@@ -1,37 +1,47 @@
-import { createResource, For, Show, createSignal } from "solid-js";
-import { useNavigate, useSearchParams } from "@solidjs/router";
+import {
+  createResource,
+  For,
+  Show,
+  createSignal
+} from "solid-js";
+import {
+  useNavigate,
+  useSearchParams
+} from "@solidjs/router";
 import { api } from "../services/api";
 import { t } from "../i18n/config";
-import LanguageSelector from "../components/LanguageSelector";
+// import LanguageSelector from "../components/LanguageSelector";
 import { useTheme } from "../stores/theme";
-import OnboardingTour from "../components/OnboardingTour";
-import type { TourStep } from "../components/OnboardingTour";
+// import OnboardingTour from "../components/OnboardingTour";
+// import type { TourStep } from "../components/OnboardingTour";
 import { LIFTNGO_URL } from "../services/api";
 
 const VehicleHistory = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = createSignal(1);
-  const { theme, toggleTheme } = useTheme();
+  useTheme();
 
-  const getThemeIcon = () => {
-    switch (theme()) {
-      case "light":
-        return "☀️";
-      case "dark":
-        return "🌙";
-      case "gruvbox":
-        return "🌲";
-      case "orange":
-        return "🔥";
-      default:
-        return "☀️";
-    }
-  };
+  // const getThemeIcon = () => {
+  //   switch (theme()) {
+  //     case "light":
+  //       return "☀️";
+  //     case "dark":
+  //       return "🌙";
+  //     case "gruvbox":
+  //       return "🌲";
+  //     case "orange":
+  //       return "🔥";
+  //     default:
+  //       return "☀️";
+  //   }
+  // };
 
   const handleComeback = () => {
     //redirect to dashboard domain : liftngo
-    window.location.href = `${LIFTNGO_URL}/dashboard`;
+    const storedPath = localStorage.getItem("liftngo_return_path");
+    const targetPath = storedPath || "/dashboard";
+    window.location.href = `${LIFTNGO_URL}${targetPath}`;
   };
 
   // Default date range: if searching by serial, use 30 days; otherwise 24 hours
@@ -135,70 +145,72 @@ const VehicleHistory = () => {
     return pages;
   };
 
-  const tourSteps: TourStep[] = [
-    {
-      title: t("tour_history_title"),
-      content: t("tour_history_content"),
-      position: "bottom",
-    },
-    {
-      target: "#tour-filter-24h",
-      title: t("tour_filter_24h_title"),
-      content: t("tour_filter_24h_content"),
-      position: "bottom",
-    },
-    {
-      target: "#tour-filter-7d",
-      title: t("tour_filter_7d_title"),
-      content: t("tour_filter_7d_content"),
-      position: "bottom",
-    },
-    {
-      target: "#tour-filter-30d",
-      title: t("tour_filter_30d_title"),
-      content: t("tour_filter_30d_content"),
-      position: "bottom",
-    },
-    {
-      target: "#tour-filter-clear",
-      title: t("tour_filter_clear_title"),
-      content: t("tour_filter_clear_content"),
-      position: "bottom",
-    },
-    {
-      target: "#tour-search-input",
-      title: t("tour_search_serial_title"),
-      content: t("tour_search_serial_content"),
-      position: "bottom",
-    },
-    {
-      target: "#tour-date-range",
-      title: t("tour_date_range_title"),
-      content: t("tour_date_range_content"),
-      position: "bottom",
-    },
-    {
-      target: "#tour-history-list",
-      title: t("tour_activity_list_title"),
-      content: t("tour_activity_list_content"),
-      position: "top",
-    },
-    {
-      target: "#tour-history-pagination",
-      title: t("tour_pagination_title"),
-      content: t("tour_pagination_content"),
-      position: "top",
-    },
-  ];
+  // const tourSteps: TourStep[] = [
+  //   {
+  //     title: t("tour_history_title"),
+  //     content: t("tour_history_content"),
+  //     position: "bottom",
+  //   },
+  //   {
+  //     target: "#tour-filter-24h",
+  //     title: t("tour_filter_24h_title"),
+  //     content: t("tour_filter_24h_content"),
+  //     position: "bottom",
+  //   },
+  //   {
+  //     target: "#tour-filter-7d",
+  //     title: t("tour_filter_7d_title"),
+  //     content: t("tour_filter_7d_content"),
+  //     position: "bottom",
+  //   },
+  //   {
+  //     target: "#tour-filter-30d",
+  //     title: t("tour_filter_30d_title"),
+  //     content: t("tour_filter_30d_content"),
+  //     position: "bottom",
+  //   },
+  //   {
+  //     target: "#tour-filter-clear",
+  //     title: t("tour_filter_clear_title"),
+  //     content: t("tour_filter_clear_content"),
+  //     position: "bottom",
+  //   },
+  //   {
+  //     target: "#tour-search-input",
+  //     title: t("tour_search_serial_title"),
+  //     content: t("tour_search_serial_content"),
+  //     position: "bottom",
+  //   },
+  //   {
+  //     target: "#tour-date-range",
+  //     title: t("tour_date_range_title"),
+  //     content: t("tour_date_range_content"),
+  //     position: "bottom",
+  //   },
+  //   {
+  //     target: "#tour-history-list",
+  //     title: t("tour_activity_list_title"),
+  //     content: t("tour_activity_list_content"),
+  //     position: "top",
+  //   },
+  //   {
+  //     target: "#tour-history-pagination",
+  //     title: t("tour_pagination_title"),
+  //     content: t("tour_pagination_content"),
+  //     position: "top",
+  //   },
+  // ];
 
   return (
     <div class="min-h-screen bg-primary transition-colors duration-300">
-      <OnboardingTour steps={tourSteps} tourKey="history_v1" />
+      {/* <OnboardingTour steps={tourSteps} tourKey="history_v1" /> */}
       <header class="bg-secondary border-b border-border-primary sticky top-0 z-50 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div class="flex items-center gap-4">
             <button
-              onClick={() => navigate("/")}
+              onClick={() => {
+                navigate("/");
+              }}
               class="p-2 rounded-full hover:bg-tertiary text-text-secondary transition-colors"
             >
               <svg
@@ -246,7 +258,7 @@ const VehicleHistory = () => {
                 </span>
               </div>
             )}
-            <LanguageSelector />
+            {/* <LanguageSelector />
             <button
               id="tour-theme-toggle"
               onClick={toggleTheme}
@@ -254,12 +266,28 @@ const VehicleHistory = () => {
               title={t("theme_toggle")}
             >
               {getThemeIcon()}
-            </button>
+            </button> */}
             <button
               onClick={handleComeback}
-              class="bg-red-500/10 text-red-500 hover:bg-red-500/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              class="bg-red-500/10 text-red-500 hover:bg-red-500/20 px-3 py-2 md:px-4 md:py-2 rounded-lg text-sm font-medium transition-colors"
+              title={t("comeback")}
             >
-              {t("comeback")}
+              <span class="md:hidden">
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  ></path>
+                </svg>
+              </span>
+              <span class="hidden md:inline">{t("comeback")}</span>
             </button>
           </div>
         </div>
@@ -273,35 +301,58 @@ const VehicleHistory = () => {
             class="p-6 border-b border-border-secondary bg-gradient-to-br from-tertiary/30 to-tertiary/10"
           >
             {/* Quick Filters */}
-            <div id="tour-quick-filters" class="mb-4 flex flex-wrap gap-2">
-              <span class="text-xs font-semibold text-text-secondary uppercase tracking-wider">
-                {t("quick_filter")}:
-              </span>
-              <button
-                id="tour-filter-24h"
-                onClick={() => setQuickFilter(24)}
-                class="px-3 py-1 text-xs font-medium bg-tertiary hover:bg-accent text-text-primary hover:text-accent-text border border-border-primary rounded-lg transition-colors"
-              >
-                {t("last_24h")}
-              </button>
-              <button
-                id="tour-filter-7d"
-                onClick={() => setQuickFilter(24 * 7)}
-                class="px-3 py-1 text-xs font-medium bg-tertiary hover:bg-accent text-text-primary hover:text-accent-text border border-border-primary rounded-lg transition-colors"
-              >
-                {t("last_7d")}
-              </button>
-              <button
-                id="tour-filter-30d"
-                onClick={() => setQuickFilter(24 * 30)}
-                class="px-3 py-1 text-xs font-medium bg-tertiary hover:bg-accent text-text-primary hover:text-accent-text border border-border-primary rounded-lg transition-colors"
-              >
-                {t("last_30d")}
-              </button>
+            <div
+              id="tour-quick-filters"
+              class="mb-4 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none"
+            >
+              <div class="flex items-center gap-2 shrink-0">
+                <span class="hidden sm:inline text-xs font-semibold text-text-secondary uppercase tracking-wider whitespace-nowrap">
+                  {t("quick_filter")}:
+                </span>
+                <span
+                  class="sm:hidden text-text-secondary p-1 bg-tertiary rounded-md"
+                  title={t("quick_filter")}
+                >
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                    />
+                  </svg>
+                </span>
+                <button
+                  id="tour-filter-24h"
+                  onClick={() => setQuickFilter(24)}
+                  class="shrink-0 px-3 py-1 text-xs font-medium bg-tertiary hover:bg-accent text-text-primary hover:text-accent-text border border-border-primary rounded-lg transition-colors whitespace-nowrap"
+                >
+                  {t("last_24h")}
+                </button>
+                <button
+                  id="tour-filter-7d"
+                  onClick={() => setQuickFilter(24 * 7)}
+                  class="shrink-0 px-3 py-1 text-xs font-medium bg-tertiary hover:bg-accent text-text-primary hover:text-accent-text border border-border-primary rounded-lg transition-colors whitespace-nowrap"
+                >
+                  {t("last_7d")}
+                </button>
+                <button
+                  id="tour-filter-30d"
+                  onClick={() => setQuickFilter(24 * 30)}
+                  class="shrink-0 px-3 py-1 text-xs font-medium bg-tertiary hover:bg-accent text-text-primary hover:text-accent-text border border-border-primary rounded-lg transition-colors whitespace-nowrap"
+                >
+                  {t("last_30d")}
+                </button>
+              </div>
               <button
                 id="tour-filter-clear"
                 onClick={clearFilters}
-                class="ml-auto px-3 py-1 text-xs font-medium text-rose-500 hover:bg-rose-500/10 border border-rose-500/20 rounded-lg transition-colors"
+                class="ml-auto shrink-0 px-3 py-1 text-xs font-medium text-rose-500 hover:bg-rose-500/10 border border-rose-500/20 rounded-lg transition-colors whitespace-nowrap"
               >
                 {t("clear_all")}
               </button>
@@ -397,15 +448,14 @@ const VehicleHistory = () => {
                     <div class="flex items-start gap-4">
                       {/* Icon based on action */}
                       <div
-                        class={`mt-1 w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                          log.action.includes("OPEN") ||
+                        class={`mt-1 w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${log.action.includes("OPEN") ||
                           log.action.includes("ACTIVATE")
-                            ? "bg-emerald-500/10 text-emerald-500"
-                            : log.action.includes("CLOSE") ||
-                                log.action.includes("DEACTIVATE")
-                              ? "bg-rose-500/10 text-rose-500"
-                              : "bg-accent/10 text-accent"
-                        }`}
+                          ? "bg-emerald-500/10 text-emerald-500"
+                          : log.action.includes("CLOSE") ||
+                            log.action.includes("DEACTIVATE")
+                            ? "bg-rose-500/10 text-rose-500"
+                            : "bg-accent/10 text-accent"
+                          }`}
                       >
                         <Show
                           when={
@@ -549,11 +599,10 @@ const VehicleHistory = () => {
                       typeof pageNum === "number" ? (
                         <button
                           onClick={() => goToPage(pageNum)}
-                          class={`w-9 h-9 rounded-lg text-sm font-medium transition-all ${
-                            page() === pageNum
-                              ? "bg-accent text-accent-text shadow-lg shadow-accent/30"
-                              : "bg-background text-text-primary hover:bg-tertiary border border-border-primary"
-                          }`}
+                          class={`w-9 h-9 rounded-lg text-sm font-medium transition-all ${page() === pageNum
+                            ? "bg-accent text-accent-text shadow-lg shadow-accent/30"
+                            : "bg-background text-text-primary hover:bg-tertiary border border-border-primary"
+                            }`}
                         >
                           {pageNum}
                         </button>

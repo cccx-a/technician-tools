@@ -10,10 +10,11 @@ export const dict = {
   comeback: "ย้อนกลับ",
   dark_mode: "โหมดมืด",
   light_mode: "โหมดสว่าง",
-  technician_dashboard: "แดชบอร์ดช่างเทคนิค",
+  technician_dashboard: "เปิดใช้งานสัญญาณรถยก",
   search_placeholder: "ค้นหายานพาหนะ (ระบุ SN/รุ่น)...",
   global_history: "ประวัติรวม",
-  fleet_dashboard: "แดชบอร์ดฟลีท",
+  open_close_history: "ประวัติเปิด/ปิด",
+  fleet_dashboard: "เปิดใช้งานรถยก",
   failed_load: "ไม่สามารถโหลดข้อมูลยานพาหนะ",
   retry: "ลองใหม่",
   no_vehicles: "ไม่พบยานพาหนะ",
@@ -128,6 +129,7 @@ export const dict = {
     "นำทางไปยังหน้าต่างๆ ของบันทึกประวัติโดยใช้ส่วนควบคุมเหล่านี้",
   // Pagination
   items_per_page: "จำนวนต่อหน้า",
+  jump_to: "ไปที่หน้า",
   // Confirmation Dialogs
   confirm_activate_title: "ยืนยันการเปิดใช้งาน?",
   confirm_activate_text: "คุณแน่ใจหรือไม่ว่าต้องการเปิดใช้งานยานพาหนะนี้?",

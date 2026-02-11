@@ -5,7 +5,7 @@ export default function DarkModeToggle() {
 
     onMount(() => {
         const saved = localStorage.getItem('darkMode');
-        const savedTheme = localStorage.getItem('theme') || 'gruvbox';
+        const savedTheme = localStorage.getItem('theme') || 'orange';
 
         if (saved) {
             const darkMode = saved === 'true';

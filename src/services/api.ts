@@ -68,9 +68,9 @@ const handleResponse = async (response: Response) => {
             throw new Error('SSO token not valid for API');
         }
 
-        // Only redirect if we had a JWT (not Liftngo token) and it expired
-        console.warn('Session expired, clearing token and redirecting to login...');
-        removeCookie('tsm');
+        // Session expired - redirect to login without removing parent domain cookies
+        console.warn('Session expired, redirecting to login...');
+        // Note: Don't removeCookie here - cookies belong to Liftngo parent domain
         localStorage.removeItem('user');
         window.location.replace('/login');
 
@@ -137,6 +137,7 @@ export const api = {
             id: item.fp_id || item.fb_id, // Use fp_id (Fleet Product) as primary ID, fallback to fb_id
             fb_id: item.fleet_box?.fb_id || item.fb_id,
             fp_id: item.fp_id,
+            m_id: item.m_id || item.matching?.m_id, // Add m_id from response or matching object
             serial_number: item.serial_number, // Product Serial Number
             box_serial_number: item.fleet_box?.serial_number, // Control Box Serial Number
             model: item.product_name || item.fleet_product?.product_name || 'Unknown Model',
@@ -144,6 +145,12 @@ export const api = {
             status: item.status === 1 ? 'active' : item.status === 2 ? 'maintenance' : 'inactive',
             battery_level: item.battery || item.fleet_product?.battery || 100,
             last_maintenance: item.updated_at || new Date().toISOString(),
+            product_id: item.product_id,
+            product_name: item.product_name,
+            location: item.location,
+            matching: item.matching, // Include full matching object
+            match_process: item.match_process,
+            fleet_box: item.fleet_box, // Include full fleet_box object
             fleet_product: {
                 fleet_name: item.fleet_name || item.fleet_product?.fleet_name,
                 serial_number: item.serial_number,
@@ -209,6 +216,53 @@ export const api = {
         }
     },
 
+    approveVehicle: async (
+        vehicleId: number | string,
+        serialNumber: string,
+        mId?: number | string,
+        fbId?: number,
+        fpId?: number
+    ): Promise<void> => {
+        try {
+            // Get user role from localStorage
+            const userJson = localStorage.getItem('user');
+            const user = userJson ? JSON.parse(userJson) : null;
+            const userRoleId = user?.role_id || 18; // Fallback to 18 if not found
+
+            // Call external Liftngo API to approve/prove matching
+            const formData = new FormData();
+            formData.append('m_id', String(mId || vehicleId));
+            formData.append('matching_process', '3');
+            formData.append('role', String(userRoleId));
+
+            console.log('Approving vehicle:', vehicleId, serialNumber, mId, fbId, fpId, userRoleId);
+            const externalResponse = await fetch('https://liftngo.tmh-wst.com/api/prove_matching', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                body: formData
+            });
+
+            if (!externalResponse.ok) {
+                const errorText = await externalResponse.text();
+                throw new Error(`External API error: ${externalResponse.status} - ${errorText}`);
+            }
+
+            // After successful external API call, log to history
+            await api.logAction(
+                'QC_APPROVE',
+                `QC Approved vehicle ${serialNumber} (ID: ${vehicleId})`,
+                fbId,
+                fpId
+            );
+
+        } catch (error) {
+            console.error('Failed to approve vehicle:', error);
+            throw error;
+        }
+    },
+
     // SSO Login with Liftngo token
     // Sends the tsm token to backend, which validates with Liftngo API
     // and returns a local JWT for subsequent API calls
@@ -222,6 +276,44 @@ export const api = {
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.message || 'SSO login failed');
+        }
+
+        const data = await response.json();
+
+        if (!data.access_token) {
+            throw new Error('Invalid server response: No access token received');
+        }
+
+        return {
+            token: data.access_token,
+            user: {
+                id: data.user?.id || 0,
+                name: data.user?.name || '',
+                email: data.user?.email || '',
+                role_id: data.user?.role_id || 1,
+                firstname: data.user?.firstname || '',
+                lastname: data.user?.lastname || '',
+                titlename: data.user?.titlename || '',
+            }
+        };
+    },
+
+    // SSO Login with Laravel encrypted cookies
+    // Sends both tsm and liftngo_session cookies to backend
+    // Backend validates with Liftngo API server-side and returns local JWT
+    ssoCookieLogin: async (tsmCookie: string, liftngoSession: string): Promise<AuthResponse> => {
+        const response = await fetch(`${BASE_URL}/auth/sso/cookie`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                tsm: tsmCookie,
+                liftngo_session: liftngoSession
+            }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'Cookie SSO login failed');
         }
 
         const data = await response.json();

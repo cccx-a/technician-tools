@@ -4,80 +4,45 @@
   --color-primary: var(--bg-primary);
   --color-secondary: var(--bg-secondary);
   --color-tertiary: var(--bg-tertiary);
-
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-tertiary: var(--text-tertiary);
-
   --color-border-primary: var(--border-primary);
   --color-border-secondary: var(--border-secondary);
-
   --color-accent: var(--accent-primary);
   --color-accent-hover: var(--accent-hover);
   --color-accent-text: var(--accent-text);
 }
 
-/* 
-  Define base variables. 
-  Note: Tailwind v4 uses P3 colors by default, but we can stick to sRGB/hex/rgb.
-  We use simple hex/rgb values.
-*/
+/* Base variables */
 :root {
   /* Light Theme (Default) */
   --bg-primary: #f8fafc;
-  /* slate-50 */
   --bg-secondary: #ffffff;
-  /* white */
   --bg-tertiary: #f1f5f9;
-  /* slate-100 */
-
   --text-primary: #1e293b;
-  /* slate-800 */
   --text-secondary: #475569;
-  /* slate-600 */
   --text-tertiary: #94a3b8;
-  /* slate-400 */
-
   --border-primary: #e2e8f0;
-  /* slate-200 */
   --border-secondary: #f1f5f9;
-  /* slate-100 */
-
   --accent-primary: #2563eb;
-  /* blue-600 */
   --accent-hover: #1d4ed8;
-  /* blue-700 */
   --accent-text: #ffffff;
-  /* white */
 }
 
 .dark {
   /* Dark Theme */
   --bg-primary: #0f172a;
-  /* slate-900 */
   --bg-secondary: #1e293b;
-  /* slate-800 */
   --bg-tertiary: #334155;
-  /* slate-700 */
-
   --text-primary: #f8fafc;
-  /* slate-50 */
   --text-secondary: #cbd5e1;
-  /* slate-300 */
   --text-tertiary: #94a3b8;
-  /* slate-400 */
-
   --border-primary: #334155;
-  /* slate-700 */
   --border-secondary: #1e293b;
-  /* slate-800 */
-
   --accent-primary: #3b82f6;
-  /* blue-500 */
   --accent-hover: #2563eb;
-  /* blue-600 */
   --accent-text: #ffffff;
-  /* white */
 }
 
 .gruvbox {
@@ -85,40 +50,319 @@
   --bg-primary: #282828;
   --bg-secondary: #32302f;
   --bg-tertiary: #3c3836;
-
   --text-primary: #ebdbb2;
   --text-secondary: #d5c4a1;
   --text-tertiary: #a89984;
-
   --border-primary: #504945;
   --border-secondary: #3c3836;
-
   --accent-primary: #d79921;
-  /* yellow */
   --accent-hover: #fabd2f;
-  /* bright yellow */
   --accent-text: #282828;
 }
 
-/* Orange Theme (Toyota/Industrial Style) */
+/* Orange Theme - Lift & GO Style */
 .orange {
-  --bg-primary: #1C1C1E;
-  /* Very dark grey, almost black */
-  --bg-secondary: #2C2C2E;
-  /* Dark grey for cards */
-  --bg-tertiary: #3A3A3C;
-  /* Slightly lighter for inputs */
+  /* Background - Clean white and light grey like Lift & GO */
+  --bg-primary: #F5F5F5;
+  /* Light grey background */
+  --bg-secondary: #FFFFFF;
+  /* Pure white for cards */
+  --bg-tertiary: #FAFAFA;
+  /* Very light grey */
 
-  --text-primary: #FFFFFF;
-  --text-secondary: #EBEBF5;
-  --text-tertiary: #EBEBF599;
-  /* 60% opacity */
+  /* Text - Dark and readable */
+  --text-primary: #2C2C2C;
+  /* Dark grey, almost black */
+  --text-secondary: #666666;
+  /* Medium grey */
+  --text-tertiary: #999999;
+  /* Light grey */
 
-  --border-primary: #38383A;
-  --border-secondary: #48484A;
+  /* Borders - Subtle and clean */
+  --border-primary: #E8E8E8;
+  /* Light border */
+  --border-secondary: #F0F0F0;
+  /* Very light border */
 
-  --accent-primary: #FF6B00;
-  /* Vibrant Orange */
-  --accent-hover: #FF8533;
+  /* Accent - Vibrant Lift & GO orange */
+  --accent-primary: #ff8952;
+  /* Main orange */
+  --accent-hover: #FF7A2E;
+  /* Darker orange on hover */
   --accent-text: #FFFFFF;
+  /* White text */
+
+  /* Additional colors matching the dashboard */
+  --orange-light: #FFE5D4;
+  /* Light orange background */
+  --orange-icon: #FFAB7A;
+  /* Icon orange */
+}
+
+/* Card styling - Clean white cards with subtle shadows */
+.orange .bg-secondary {
+  background: #FFFFFF;
+  border: 1px solid #E8E8E8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.orange .hover\:shadow-xl:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+/* Accent buttons - Vibrant orange gradient */
+.orange .bg-accent {
+  background: linear-gradient(135deg, #FF8C42 0%, #FFA366 100%);
+  border: none;
+  box-shadow: 0 2px 8px rgba(255, 140, 66, 0.3);
+}
+
+.orange .bg-accent:hover {
+  background: linear-gradient(135deg, #FF7A2E 0%, #FF8C42 100%);
+  box-shadow: 0 4px 12px rgba(255, 122, 46, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Navigation bar - Clean white with subtle shadow */
+.orange nav.bg-secondary {
+  background: #FFFFFF;
+  border-bottom: 1px solid #E8E8E8;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+/* Status badges - Using original colors with orange accent */
+.orange .bg-green-500\/15 {
+  background: #E8F5E9;
+  color: #2E7D32;
+  border-color: #A5D6A7;
+}
+
+.orange .bg-yellow-500\/15 {
+  background: #FFF8E1;
+  color: #F57C00;
+  border-color: #FFD54F;
+}
+
+.orange .bg-red-500\/15 {
+  background: #FFEBEE;
+  color: #C62828;
+  border-color: #EF9A9A;
+}
+
+/* Icon backgrounds - Soft orange tones */
+.orange .bg-tertiary\/80 {
+  background: #FFF8F4;
+  border-color: #FFE5D4;
+}
+
+.orange .bg-tertiary\/50 {
+  background: rgba(255, 229, 212, 0.5);
+}
+
+/* Input fields - Clean with orange focus */
+.orange input,
+.orange select {
+  background: #FAFAFA;
+  border: 1px solid #E8E8E8;
+  color: #2C2C2C;
+}
+
+.orange input:focus,
+.orange select:focus {
+  border-color: #FF8C42;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.1);
+  background: #FFFFFF;
+}
+
+/* Loading spinner */
+.orange .animate-spin {
+  border-color: #E8E8E8;
+  border-top-color: #FF8C42;
+}
+
+/* Online indicator - Keep green with stronger glow */
+.orange .bg-green-500 {
+  background: #4CAF50;
+}
+
+.orange .animate-pulse.shadow-\[0_0_8px_rgba\(34\,197\,94\,0\.6\)\] {
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.8);
+}
+
+/* Data metric cards - Light background */
+.orange .bg-background\/60 {
+  background: #FAFAFA;
+  border: 1px solid #F0F0F0;
+}
+
+/* Button hover effects */
+.orange button:not(:disabled):hover {
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+.orange button:not(:disabled):active {
+  transform: translateY(0);
+}
+
+/* Scrollbar - Orange themed */
+.orange ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.orange ::-webkit-scrollbar-track {
+  background: #F5F5F5;
+}
+
+.orange ::-webkit-scrollbar-thumb {
+  background: #FFB89A;
+  border-radius: 4px;
+}
+
+.orange ::-webkit-scrollbar-thumb:hover {
+  background: #FF8C42;
+}
+
+/* Data change animations - Orange ring */
+.orange .ring-2.ring-blue-500\/50 {
+  --tw-ring-color: rgba(255, 140, 66, 0.5);
+  box-shadow: 0 0 0 2px rgba(255, 140, 66, 0.5);
+}
+
+.orange .ring-2.ring-orange-500\/50 {
+  --tw-ring-color: rgba(255, 140, 66, 0.5);
+}
+
+.orange .ring-2.ring-yellow-500\/50 {
+  --tw-ring-color: rgba(255, 193, 7, 0.5);
+}
+
+.orange .ring-2.ring-purple-500\/50 {
+  --tw-ring-color: rgba(156, 39, 176, 0.5);
+}
+
+.orange .ring-2.ring-cyan-500\/50 {
+  --tw-ring-color: rgba(0, 188, 212, 0.5);
+}
+
+/* Recent activity section */
+.orange .bg-tertiary\/30 {
+  background: #FAFAFA;
+  border: 1px solid #F0F0F0;
+}
+
+.orange .hover\:bg-background\/30:hover {
+  background: #F8F8F8;
+}
+
+/* Action buttons - Green and Red with white backgrounds */
+.orange button.bg-primary {
+  background: #FFFFFF;
+  border: 2px solid #E8E8E8;
+}
+
+.orange button.bg-primary:hover {
+  background: #FAFAFA;
+  border-color: #D0D0D0;
+}
+
+.orange .bg-green-100 {
+  background: #E8F5E9;
+}
+
+.orange .bg-red-100 {
+  background: #FFEBEE;
+}
+
+.orange .text-green-700,
+.orange .text-green-600 {
+  color: #2E7D32;
+}
+
+.orange .text-red-600,
+.orange .text-red-500 {
+  color: #C62828;
+}
+
+/* Pagination */
+.orange .hover\:bg-tertiary:hover {
+  background: #FAFAFA;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 200ms;
+  transition-timing-function: ease-in-out;
+}
+
+.animate-spin,
+.animate-pulse,
+.animate-bounce {
+  transition-property: none;
+}
+
+/* Virtual Cursor Animation - Used in VehicleCardV2 */
+@keyframes cursor-move {
+  0% {
+    opacity: 0;
+    transform: translate(80px, 60px) scale(1);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(40px, 30px) scale(1);
+  }
+  40% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(0, 0) scale(0.8);
+  }
+  55% {
+    transform: translate(0, 0) scale(1);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-20px, -20px) scale(0.8);
+  }
+}
+
+@keyframes click-ripple {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  40% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  70% {
+    opacity: 0.3;
+    transform: scale(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+.animate-virtual-cursor {
+  animation: cursor-move 3s ease-out forwards;
+}
+
+.animate-click-ripple {
+  animation: click-ripple 3s ease-out forwards;
 }

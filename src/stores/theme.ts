@@ -7,7 +7,8 @@ const getInitialTheme = (): Theme => {
     if (savedTheme && ['light', 'dark', 'gruvbox', 'orange'].includes(savedTheme)) {
         return savedTheme;
     }
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    // Default to orange theme (Toyota/Liftngo style)
+    return 'orange';
 };
 
 const [theme, setTheme] = createSignal<Theme>(getInitialTheme());
