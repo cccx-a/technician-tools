@@ -66,6 +66,29 @@ const AuthGuard: Component<{ children: any }> = (props) => {
     if (isLocalJwt) {
       // Already have local JWT - authenticated
       console.log("AuthGuard: Found local JWT, authenticated");
+
+      // Restore user profile if it was removed (e.g., after a 401 response)
+      const existingUser = localStorage.getItem("user");
+      if (!existingUser) {
+        console.log("AuthGuard: User profile missing, decoding from JWT...");
+        try {
+          const payload = JSON.parse(atob(existingToken.split('.')[1]));
+          const user = {
+            id: payload.id || payload.sub || 0,
+            name: payload.name || '',
+            email: payload.email || '',
+            role_id: payload.role_id || 1,
+            firstname: payload.firstname || '',
+            lastname: payload.lastname || '',
+            titlename: payload.titlename || '',
+          };
+          localStorage.setItem("user", JSON.stringify(user));
+          console.log("AuthGuard: User profile restored from JWT");
+        } catch (e) {
+          console.warn("AuthGuard: Failed to decode user from JWT:", e);
+        }
+      }
+
       setIsAuthenticated(true);
       setIsLoading(false);
       return;
