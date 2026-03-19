@@ -236,7 +236,7 @@ export const api = {
             formData.append('role', String(userRoleId));
 
             console.log('Approving vehicle:', vehicleId, serialNumber, mId, fbId, fpId, userRoleId);
-            const externalResponse = await fetch('https://liftngo.tmh-wst.com/api/prove_matching', {
+            const externalResponse = await fetch(`${LIFTNGO_URL}/api/prove_matching`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
