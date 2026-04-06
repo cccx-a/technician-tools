@@ -142,6 +142,9 @@ export const api = {
             box_serial_number: item.fleet_box?.serial_number, // Control Box Serial Number
             model: item.product_name || item.fleet_product?.product_name || 'Unknown Model',
             model_code: item.model_code?.toString() || item.model?.toString() || '0',
+            image: item.product_image
+                ? `https://liftngo.tmh-wst.com/images/product/${item.product_image.split(',')[0]}`
+                : '/folklift-image-nobg.png',
             status: item.status === 1 ? 'active' : item.status === 2 ? 'maintenance' : 'inactive',
             battery_level: item.battery || item.fleet_product?.battery || 100,
             last_maintenance: item.updated_at || new Date().toISOString(),
@@ -159,7 +162,15 @@ export const api = {
                     name: item.product_name
                 }
             },
-            image: 'https://images.unsplash.com/photo-1532906619279-a7826040495f?auto=format&fit=crop&w=300&q=80' // Placeholder
+            // image: (() => {
+            //     const modelImageMap: Record<string, string> = {
+            //         'BT Reflex with Tilting cab 1.4t – 2.5 t': '/model_forklift/model1.webp',
+            //         'BT Tyro 1.5t with Lithium-ion': '/model_forklift/model2.webp',
+            //         'BT Levio Platform Powered Pallet 2.0t': '/model_forklift/model3.webp',
+            //     };
+            //     const name = item.product_name || item.fleet_product?.product_name || '';
+            //     return modelImageMap[name] || '/model_forklift/model1.webp';
+            // })()
         }));
 
         return { data: vehicles, meta };
@@ -236,7 +247,7 @@ export const api = {
             formData.append('role', String(userRoleId));
 
             console.log('Approving vehicle:', vehicleId, serialNumber, mId, fbId, fpId, userRoleId);
-            const externalResponse = await fetch('https://liftngo.tmh-wst.com/api/prove_matching', {
+            const externalResponse = await fetch(`${LIFTNGO_URL}/api/prove_matching`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
