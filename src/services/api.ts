@@ -309,44 +309,6 @@ export const api = {
         };
     },
 
-    // SSO Login with Laravel encrypted cookies
-    // Sends both tsm and liftngo_session cookies to backend
-    // Backend validates with Liftngo API server-side and returns local JWT
-    ssoCookieLogin: async (tsmCookie: string, liftngoSession: string): Promise<AuthResponse> => {
-        const response = await fetch(`${BASE_URL}/auth/sso/cookie`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                tsm: tsmCookie,
-                liftngo_session: liftngoSession
-            }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || 'Cookie SSO login failed');
-        }
-
-        const data = await response.json();
-
-        if (!data.access_token) {
-            throw new Error('Invalid server response: No access token received');
-        }
-
-        return {
-            token: data.access_token,
-            user: {
-                id: data.user?.id || 0,
-                name: data.user?.name || '',
-                email: data.user?.email || '',
-                role_id: data.user?.role_id || 1,
-                firstname: data.user?.firstname || '',
-                lastname: data.user?.lastname || '',
-                titlename: data.user?.titlename || '',
-            }
-        };
-    },
-
     // Legacy: Cookie-based authentication using tsm cookie from parent domain (liftngo)
     // Note: This is deprecated, use ssoLogin instead
     loginWithCookie: async (): Promise<AuthResponse | null> => {
