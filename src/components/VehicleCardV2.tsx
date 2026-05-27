@@ -30,12 +30,15 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
 
   const [showCursor, setShowCursor] = createSignal(false);
   // Local override for match_process to update UI immediately after approval
-  const [matchProcessOverride, setMatchProcessOverride] = createSignal<number | null>(null);
-  const currentMatchProcess = () => matchProcessOverride() ?? props.vehicle.match_process;
+  const [matchProcessOverride, setMatchProcessOverride] = createSignal<
+    number | null
+  >(null);
+  const currentMatchProcess = () =>
+    matchProcessOverride() ?? props.vehicle.match_process;
 
   // Get user role from localStorage
   const getUserRoleId = () => {
-    const userJson = localStorage.getItem('user');
+    const userJson = localStorage.getItem("user");
     const user = userJson ? JSON.parse(userJson) : null;
     return user?.role_id || 0;
   };
@@ -156,8 +159,6 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
     });
   };
 
-
-
   // const getModeLabel = (mode: number) => {
   //   switch (mode) {
   //     case 0:
@@ -214,23 +215,30 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
         popup: "rounded-xl",
         title: "text-lg font-bold text-gray-800",
         confirmButton: "rounded-lg px-6 py-2",
-        cancelButton: "rounded-lg px-6 py-2"
-      }
+        cancelButton: "rounded-lg px-6 py-2",
+      },
     });
 
     if (result.isConfirmed) {
       try {
-        console.log('Approving vehicle - m_id:', props.vehicle.m_id, 'fp_id:', props.vehicle.fp_id, 'serial_number:', props.vehicle.serial_number);
+        console.log(
+          "Approving vehicle - m_id:",
+          props.vehicle.m_id,
+          "fp_id:",
+          props.vehicle.fp_id,
+          "serial_number:",
+          props.vehicle.serial_number,
+        );
         await api.approveVehicle(
           props.vehicle.fp_id,
           props.vehicle.serial_number,
-          props.vehicle.m_id,  // m_id for external API
+          props.vehicle.m_id, // m_id for external API
           props.vehicle.matching?.fb_id, // for history logging
-          props.vehicle.fp_id  // for history logging
+          props.vehicle.fp_id, // for history logging
         );
 
         // Update local state immediately so UI reflects change without refresh
-        setMatchProcessOverride(3);
+        setMatchProcessOverride(4);
 
         await Swal.fire({
           title: t("success_title") || "สำเร็จ",
@@ -239,8 +247,8 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
           timer: 2000,
           showConfirmButton: false,
           customClass: {
-            popup: "rounded-xl"
-          }
+            popup: "rounded-xl",
+          },
         });
       } catch (error) {
         console.error("Error approving vehicle:", error);
@@ -250,8 +258,8 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
           icon: "error",
           confirmButtonText: "ตกลง",
           customClass: {
-            popup: "rounded-xl"
-          }
+            popup: "rounded-xl",
+          },
         });
       }
     }
@@ -262,42 +270,48 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
       id={props.id}
       class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full transition-all duration-200 hover:shadow-xl relative"
     >
-
       <div class="px-4 py-3 border-b border-gray-100 flex justify-between items-center bg-white gap-2">
         <label
           class="font-bold text-sm text-gray-700 truncate cursor-pointer hover:text-blue-600 transition-colors"
-          title={String(props.vehicle.product_name || props.vehicle.model || "คันกลาง")}
+          title={String(
+            props.vehicle.product_name || props.vehicle.model || "คันกลาง",
+          )}
           onClick={() => {
             Swal.fire({
-              title: String(props.vehicle.product_name || props.vehicle.model || "คันกลาง"),
+              title: String(
+                props.vehicle.product_name || props.vehicle.model || "คันกลาง",
+              ),
               text: "ชื่อรุ่นรถเต็ม",
               confirmButtonText: "ตกลง",
               confirmButtonColor: "#3b82f6",
               customClass: {
                 popup: "rounded-xl",
                 title: "text-lg font-bold text-gray-800",
-                confirmButton: "rounded-lg px-6 py-2"
-              }
+                confirmButton: "rounded-lg px-6 py-2",
+              },
             });
           }}
         >
-          {props.vehicle.product_name || String(props.vehicle.model) || "คันกลาง"}
+          {props.vehicle.product_name ||
+            String(props.vehicle.model) ||
+            "คันกลาง"}
         </label>
         <span
-          class={`badge px-3 py-1 rounded text-sm font-semibold whitespace-nowrap shrink-0 ${status() === "connected" && parsedData()?.mode !== 0
-            ? "bg-green-100 text-green-700 border border-green-200"
-            : "bg-gray-100 text-gray-500 border border-gray-200"
-            }`}
+          class={`badge px-3 py-1 rounded text-sm font-semibold whitespace-nowrap shrink-0 ${
+            status() === "connected" && parsedData()?.mode !== 0
+              ? "bg-green-100 text-green-700 border border-green-200"
+              : "bg-gray-100 text-gray-500 border border-gray-200"
+          }`}
         >
-          {status() === "connected" && parsedData()?.mode !== 0 ? "เปิดใช้งาน" : "ปิดใช้งาน"}
+          {status() === "connected" && parsedData()?.mode !== 0
+            ? "เปิดใช้งาน"
+            : "ปิดใช้งาน"}
         </span>
       </div>
 
       {/* Card Body */}
       <div class="p-4 flex-1 flex flex-col">
         <div class="space-y-2">
-
-
           {/* Temperature */}
           <p class="text-[15px] text-gray-700 flex justify-between whitespace-nowrap">
             <span>อุณหภูมิ:</span>
@@ -315,71 +329,95 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
           </p>
 
           {/* Match Process Status */}
-          {getUserRoleId() === 18 && (() => {
-            const getMatchProcessLabel = (process: number) => {
-              switch (process) {
-                case 1: return "รอประกอบ";
-                case 2: return "ประกอบสำเร็จ";
-                case 3: return "รอ QC";
-                case 4: return "QC สำเร็จ";
-                default: return "รอ PDI Assembly ประกอบรถ";
-              }
-            };
+          {getUserRoleId() === 18 &&
+            (() => {
+              const getMatchProcessLabel = (process: number) => {
+                switch (process) {
+                  case 1:
+                    return "รอประกอบ";
+                  case 2:
+                    return "ประกอบสำเร็จ";
+                  case 3:
+                    return "รอ QC";
+                  case 4:
+                    return "QC สำเร็จ";
+                  default:
+                    return "รอ PDI Assembly ประกอบรถ";
+                }
+              };
 
-            const getMatchProcessStyle = (process: number) => {
-              switch (process) {
-                case 1: return "bg-blue-100 text-blue-700 border-blue-300";
-                case 2: return "bg-yellow-100 text-yellow-700 border-yellow-300";
-                case 3: return "bg-orange-100 text-orange-700 border-orange-300";
-                case 4: return "bg-green-100 text-green-700 border-green-300";
-                default: return "bg-gray-100 text-gray-600 border-gray-300";
-              }
-            };
+              const getMatchProcessStyle = (process: number) => {
+                switch (process) {
+                  case 1:
+                    return "bg-blue-100 text-blue-700 border-blue-300";
+                  case 2:
+                    return "bg-yellow-100 text-yellow-700 border-yellow-300";
+                  case 3:
+                    return "bg-orange-100 text-orange-700 border-orange-300";
+                  case 4:
+                    return "bg-green-100 text-green-700 border-green-300";
+                  default:
+                    return "bg-gray-100 text-gray-600 border-gray-300";
+                }
+              };
 
-            const getMatchProcessIcon = (process: number) => {
-              switch (process) {
-                case 1: return "📦";
-                case 2: return "🔧";
-                case 3: return "🔍";
-                case 4: return "✅";
-                default: return "⏳";
-              }
-            };
+              const getMatchProcessIcon = (process: number) => {
+                switch (process) {
+                  case 1:
+                    return "📦";
+                  case 2:
+                    return "🔧";
+                  case 3:
+                    return "🔍";
+                  case 4:
+                    return "✅";
+                  default:
+                    return "⏳";
+                }
+              };
 
-            const matchProcess = currentMatchProcess() || 0;
+              const matchProcess = currentMatchProcess() || 0;
 
-            return (
-              <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
-                {/* Status Label and Badge - Stacked for consistency */}
-                <div class="flex flex-col gap-2">
-                  <div class="flex items-center justify-between gap-2">
-                    <span class="text-[13px] text-gray-600 shrink-0">สถานะ:</span>
-                    <span class={`px-2 py-0.5 rounded text-[11px] font-semibold border whitespace-nowrap ${getMatchProcessStyle(matchProcess)}`}>
-                      {getMatchProcessIcon(matchProcess)} {getMatchProcessLabel(matchProcess)}
-                    </span>
-                  </div>
-                  {/* Progress Steps */}
-                  <div class="flex items-center gap-0.5">
-                    {[1, 2, 3, 4].map((step) => (
-                      <div
-                        class={`flex-1 h-1 rounded-full transition-all duration-300 ${step <= matchProcess
-                          ? step === 4 ? "bg-green-500" : "bg-orange-400"
-                          : "bg-gray-200"
+              return (
+                <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
+                  {/* Status Label and Badge - Stacked for consistency */}
+                  <div class="flex flex-col gap-2">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-[13px] text-gray-600 shrink-0">
+                        สถานะ:
+                      </span>
+                      <span
+                        class={`px-2 py-0.5 rounded text-[11px] font-semibold border whitespace-nowrap ${getMatchProcessStyle(matchProcess)}`}
+                      >
+                        {getMatchProcessIcon(matchProcess)}{" "}
+                        {getMatchProcessLabel(matchProcess)}
+                      </span>
+                    </div>
+                    {/* Progress Steps */}
+                    <div class="flex items-center gap-0.5">
+                      {[1, 2, 3, 4].map((step) => (
+                        <div
+                          class={`flex-1 h-1 rounded-full transition-all duration-300 ${
+                            step <= matchProcess
+                              ? step === 4
+                                ? "bg-green-500"
+                                : "bg-orange-400"
+                              : "bg-gray-200"
                           }`}
-                      />
-                    ))}
-                  </div>
-                  {/* Step Labels */}
-                  <div class="flex justify-between text-[9px] text-gray-400 -mt-1">
-                    <span>PDI Assembly</span>
-                    <span>PDI QC</span>
-                    <span>QC Waiting</span>
-                    <span>Complete</span>
+                        />
+                      ))}
+                    </div>
+                    {/* Step Labels */}
+                    <div class="flex justify-between text-[9px] text-gray-400 -mt-1">
+                      <span>PDI Assembly</span>
+                      <span>PDI QC</span>
+                      <span>QC Waiting</span>
+                      <span>Complete</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })()}
+              );
+            })()}
 
           {/* Button approve product - Only show for role_id 18, only enabled when match_process === 2 */}
           {getUserRoleId() === 18 && (
@@ -397,16 +435,25 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
                 <button
                   onClick={handleApproveVehicle}
                   disabled={currentMatchProcess() !== 2}
-                  class={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${currentMatchProcess() === 2
-                    ? "bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 hover:border-green-300 cursor-pointer"
-                    : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed opacity-60"
-                    }`}
-                  title={currentMatchProcess() !== 2 ? "ต้องรอ PDI Assembly เสร็จก่อนถึงจะทำ QC ได้" : ""}
+                  class={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                    currentMatchProcess() === 2
+                      ? "bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 hover:border-green-300 cursor-pointer"
+                      : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed opacity-60"
+                  }`}
+                  title={
+                    currentMatchProcess() !== 2
+                      ? "ต้องรอ PDI Assembly เสร็จก่อนถึงจะทำ QC ได้"
+                      : ""
+                  }
                 >
                   {/* <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg> */}
-                  {currentMatchProcess() === 2 ? "เปิดใช้สัญญาณรถ" : currentMatchProcess() === 3 ? "รอตรวจ QC" : "รอ PDI Assembly ประกอบรถ"}
+                  {currentMatchProcess() === 2
+                    ? "เปิดใช้สัญญาณรถ"
+                    : currentMatchProcess() === 3
+                      ? "รอตรวจ QC"
+                      : "รอ PDI Assembly ประกอบรถ"}
                 </button>
               )}
               {showCursor() && currentMatchProcess() === 2 && (
@@ -434,7 +481,9 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
           <p class="text-base text-gray-600 flex justify-between border-b border-dashed border-gray-200 pb-1">
             <span>S/N กล่อง:</span>
             <span class="font-mono text-gray-800 font-medium">
-              {props.vehicle.fleet_box?.serial_number || props.vehicle.box_serial_number || "-"}
+              {props.vehicle.fleet_box?.serial_number ||
+                props.vehicle.box_serial_number ||
+                "-"}
             </span>
           </p>
           <p class="text-base text-gray-600 flex justify-between">
@@ -445,14 +494,17 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
           </p>
         </div>
 
-
-
         {/* Legacy Actions */}
         <div class="space-y-2 mt-auto pt-3 border-t border-gray-100">
           <div class="grid grid-cols-2 gap-2">
             <button
               onClick={() => sendCommandLegacy(true)}
-              disabled={!isMqttConnected() || props.vehicle.match_process !== 2 && props.vehicle.match_process !== 3 && props.vehicle.match_process !== 4}
+              disabled={
+                !isMqttConnected() ||
+                (props.vehicle.match_process !== 2 &&
+                  props.vehicle.match_process !== 3 &&
+                  props.vehicle.match_process !== 4)
+              }
               class="group rounded-md border border-gray-200 hover:bg-green-50 hover:border-green-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed py-1.5"
             >
               <div class="flex items-center justify-center gap-1.5">
@@ -479,7 +531,12 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
 
             <button
               onClick={() => sendCommandLegacy(false)}
-              disabled={!isMqttConnected() || props.vehicle.match_process !== 2 && props.vehicle.match_process !== 3 && props.vehicle.match_process !== 4}
+              disabled={
+                !isMqttConnected() ||
+                (props.vehicle.match_process !== 2 &&
+                  props.vehicle.match_process !== 3 &&
+                  props.vehicle.match_process !== 4)
+              }
               class="group rounded-md border border-gray-200 hover:bg-red-50 hover:border-red-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed py-1.5"
             >
               <div class="flex items-center justify-center gap-1.5">
@@ -526,7 +583,7 @@ const VehicleCardV2: Component<VehicleCardV2Props> = (props) => {
           </a>
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 

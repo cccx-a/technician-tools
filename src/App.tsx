@@ -4,7 +4,7 @@ import { Router, Route } from "@solidjs/router";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import VehicleHistory from "./pages/VehicleHistory";
-import { api, getCookie, setCookie, removeCookie } from "./services/api";
+import { api, getCookie, setCookie } from "./services/api";
 
 const AuthGuard: Component<{ children: any }> = (props) => {
   const [isAuthenticated, setIsAuthenticated] = createSignal<boolean | null>(
@@ -40,28 +40,9 @@ const AuthGuard: Component<{ children: any }> = (props) => {
       }
     };
 
-    // Helper function to detect Laravel encrypted cookie
-    const isLaravelEncryptedCookie = (token: string): boolean => {
-      try {
-        // Try URL decode first
-        const decoded = decodeURIComponent(token);
-        // Try to parse as JSON
-        const parsed = JSON.parse(atob(decoded));
-        // Laravel encrypted cookie has 'iv', 'value', 'mac' fields
-        return parsed.iv && parsed.value && parsed.mac;
-      } catch {
-        return false;
-      }
-    };
-
     // Check token type
     const isLocalJwt = existingToken && isValidJWT(existingToken);
     const isLiftngoToken = existingToken && /^\d+\|/.test(existingToken);
-    const isEncryptedCookie = existingToken && isLaravelEncryptedCookie(existingToken);
-
-    // Also log liftngo_session for debugging
-    const liftngoSession = getCookie("liftngo_session");
-    console.log("AuthGuard: liftngo_session cookie:", liftngoSession ? `found (${liftngoSession.substring(0, 20)}...)` : "NULL");
 
     if (isLocalJwt) {
       // Already have local JWT - authenticated
@@ -114,59 +95,6 @@ const AuthGuard: Component<{ children: any }> = (props) => {
         }
       } catch (error: any) {
         console.warn("AuthGuard: SSO login failed:", error?.message || error);
-        // Don't remove cookies from parent domain - they belong to Liftngo
-        setIsAuthenticated(false);
-      }
-      setIsLoading(false);
-      return;
-    }
-
-    if (isEncryptedCookie) {
-      // Have Laravel encrypted session cookie - need liftngo_session too
-      console.log("AuthGuard: Found Laravel encrypted cookie, exchanging via backend...");
-
-      // Get liftngo_session cookie too (required by Liftngo API)
-      const liftngoSession = getCookie("liftngo_session");
-
-      if (!liftngoSession) {
-        console.warn("AuthGuard: Missing liftngo_session cookie");
-        setIsAuthenticated(false);
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const ssoResult = await api.ssoCookieLogin(existingToken, liftngoSession);
-
-        if (ssoResult) {
-          // Cookie SSO successful - store local JWT
-          setCookie("tsm", ssoResult.token);
-          localStorage.setItem("user", JSON.stringify(ssoResult.user));
-          // Save encrypted cookies for potential logout later
-          localStorage.setItem("liftngo_tsm", existingToken);
-          localStorage.setItem("liftngo_session", liftngoSession);
-          console.log("AuthGuard: Cookie SSO login successful");
-          setIsAuthenticated(true);
-        } else {
-          console.warn("AuthGuard: Cookie SSO login returned no result");
-          setIsAuthenticated(false);
-        }
-      } catch (error: any) {
-        console.warn("AuthGuard: Cookie SSO login failed:", error?.message || error);
-
-        // If permission denied (403), stop redirect loop and show error
-        if (error.message && error.message.includes("permission")) {
-          console.error("AuthGuard: Permission denied, stopping redirect loop");
-          setIsAuthenticated(false);
-          setIsLoading(false);
-          alert(`Login failed: ${error.message}`); // Simple alert for now, better UI later
-          // Clear cookies to allow relogin with different account
-          removeCookie("tsm");
-          removeCookie("liftngo_session");
-          window.location.replace("/login");
-          return;
-        }
-
         // Don't remove cookies from parent domain - they belong to Liftngo
         setIsAuthenticated(false);
       }
