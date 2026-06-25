@@ -11,7 +11,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 // Liftngo URL for redirects and authentication
 // Use VITE_LIFTNGO_URL env variable (add to .env file)
 export const LIFTNGO_URL =
-  import.meta.env.VITE_LIFTNGO_URL || "https://liftngo.tmh-wst.com";
+  import.meta.env.VITE_LIFTNGO_URL || "https://liftngo.liftandgosolutions.com";
 
 // Liftngo API URL (same as LIFTNGO_URL for now, but can be different if needed)
 const LIFTNGO_API_URL = LIFTNGO_URL;
@@ -37,10 +37,13 @@ export const setCookie = (
   expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
   // Use SameSite=Lax for subdomain compatibility, Secure for HTTPS
   const secure = window.location.protocol === "https:" ? "; Secure" : "";
-  // Use parent domain .tmh-wst.com to override Liftngo's tsm cookie
-  const domain = window.location.hostname.includes("tmh-wst.com")
-    ? "; domain=.tmh-wst.com"
-    : "";
+  // Use parent domain to override Liftngo's tsm cookie
+  let domain = "";
+  if (window.location.hostname.includes("tmh-wst.com")) {
+    domain = "; domain=.tmh-wst.com";
+  } else if (window.location.hostname.includes("liftandgosolutions.com")) {
+    domain = "; domain=.liftandgosolutions.com";
+  }
   document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/${secure}${domain}; SameSite=Lax`;
 };
 
@@ -50,6 +53,8 @@ export const removeCookie = (name: string): void => {
   // Also try to remove from parent domain
   if (window.location.hostname.includes("tmh-wst.com")) {
     document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.tmh-wst.com`;
+  } else if (window.location.hostname.includes("liftandgosolutions.com")) {
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.liftandgosolutions.com`;
   }
 };
 
