@@ -11,7 +11,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 // Liftngo URL for redirects and authentication
 // Use VITE_LIFTNGO_URL env variable (add to .env file)
 export const LIFTNGO_URL =
-  import.meta.env.VITE_LIFTNGO_URL || "https://liftngo.liftandgosolutions.com";
+  import.meta.env.VITE_LIFTNGO_URL || "https://u.liftandgosolutions.com";
 
 // Liftngo API URL (same as LIFTNGO_URL for now, but can be different if needed)
 const LIFTNGO_API_URL = LIFTNGO_URL;
